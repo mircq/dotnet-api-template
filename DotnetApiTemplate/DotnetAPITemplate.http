@@ -1,0 +1,6 @@
+@DotnetApiTemplate_HostAddress = http://localhost:5040
+
+GET {{HumanitasDotnetTemplate_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
