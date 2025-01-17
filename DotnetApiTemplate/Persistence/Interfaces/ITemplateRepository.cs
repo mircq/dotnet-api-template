@@ -18,7 +18,7 @@ public interface ITemplateRepository
     #endregion
 
     #region Delete
-    Task<Result<TemplateEntity>> DeleteAsync(int id);
+    Task<Result<TemplateEntity>> DeleteAsync(Guid id);
     #endregion
 
     #region Patch

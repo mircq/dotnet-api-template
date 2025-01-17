@@ -32,37 +32,87 @@ public class TemplateRepository: ITemplateRepository
             return errorResult;
         }
 
-        Result<TemplateEntity> successfulResult = findResult;
-
-        return successfulResult;
+        return findResult;
     }
     #endregion
 
     #region Post
     public async Task<Result<TemplateEntity>> PostAsync(TemplateEntity entity)
     {
-        return await _context.Templates.AddAsync(entity);
+        await _context.Templates.AddAsync(entity);
+
+        await _context.SaveChangesAsync();
+
+        return entity;
     }
     #endregion
 
     #region Put
-    public async Result<TemplateEntity> PutAsync(Guid id, TemplateEntity entity)
+    public async Task<Result<TemplateEntity>> PutAsync(Guid id, TemplateEntity entity)
     {
+        TemplateEntity? entity_to_update = await _context.Templates.FindAsync(id);
+
+        if (entity_to_update == null)
+        {
+            Result<TemplateEntity> errorResult = GenericErrors.NotFoundError(
+                entityType: "template",
+                id: id
+                );
+            return errorResult;
+        }
+
+        entity.Id = id;
+
+        _context.Templates.Update(entity: entity);
+
+        await _context.SaveChangesAsync();
+
+        return entity;
 
     }
     #endregion
 
     #region Delete
-    public async Result<TemplateEntity> DeleteAsync(Guid id)
+    public async Task<Result<TemplateEntity>> DeleteAsync(Guid id)
     {
-        TemplateEntity? findResult = await _context.Templates.ExecuteDeleteAsync(id);
+        TemplateEntity? entity = await _context.Templates.FindAsync(id);
+
+        if (entity == null)
+        {
+            Result<TemplateEntity> errorResult = GenericErrors.NotFoundError(
+                entityType: "template",
+                id: id
+                );
+            return errorResult;
+        }
+
+        _context.Templates.Remove(entity: entity);
+
+        await _context.SaveChangesAsync();
+
+        return entity;
     }
     #endregion
 
     #region Patch
-    public async Result<TemplateEntity> PatchAsync(Guid id, TemplateEntity entity)
+    public async Task<Result<TemplateEntity>> PatchAsync(Guid id, List<PatchEntity> patches)
     {
 
+        TemplateEntity? entity = await _context.Templates.FindAsync(id);
+
+        if (entity == null)
+        {
+            Result<TemplateEntity> errorResult = GenericErrors.NotFoundError(
+                entityType: "template",
+                id: id
+                );
+            return errorResult;
+        }
+
+        // TODO
+        //patchDoc.ApplyTo(car, ModelState);
+
+        return entity;
     }
     #endregion
 
