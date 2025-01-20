@@ -5,17 +5,16 @@ using Infrastructure;
 using Persistence;
 using Presentation;
 
-Console.WriteLine("Running Program.cs in API layer...");
-
-
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddEnvironmentVariables();
+
 // Initialize layers
-builder.Services.InitializeDomain();
-builder.Services.InitializePersistence();
-builder.Services.InitializeApplication();
-builder.Services.InitializeInfrastructure();
-builder.Services.InitializePresentation();
+builder.Services.AddDomain();
+builder.Services.AddPersistence(configuration: builder.Configuration);
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure();
+builder.Services.AddPresentation();
 
 // Add Swagger generation
 builder.Services.AddEndpointsApiExplorer();

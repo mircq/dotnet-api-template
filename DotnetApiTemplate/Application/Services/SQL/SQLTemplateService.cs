@@ -5,9 +5,9 @@ using Persistence.Interfaces;
 
 namespace Application.Services.SQL;
 
-public class SQLTemplateService: ISQLTemplateService
+public class SQLTemplateService(ITemplateRepository templateRepository) : ISQLTemplateService
 {
-    private readonly ITemplateRepository _templateRepository;
+    private readonly ITemplateRepository _templateRepository = templateRepository;
 
     #region Get
 

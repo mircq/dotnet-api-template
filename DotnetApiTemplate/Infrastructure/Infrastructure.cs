@@ -2,7 +2,7 @@
 
 public static class Infrastructure
 {
-    public static void InitializeInfrastructure(this IServiceCollection services)
+    public static void AddInfrastructure(this IServiceCollection services)
     {
 
     }

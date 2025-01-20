@@ -8,8 +8,10 @@ using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Presentation.DTOs.Generic;
 using Presentation.DTOs.NoSQL;
+using Presentation.Examples.NoSQL;
 using Presentation.Mappers.Generic;
 using Presentation.Mappers.NoSQL;
+using Presentation.Examples.NoSQL;
 
 namespace Presentation.Endpoints;
 
@@ -38,54 +40,15 @@ public class NoSQLTemplateEndpoints: ICarterModule
 
                 return Results.Ok(value: result.Value);
             }
-        ).WithTags(tags: ["NoSQL"])
-        .WithSummary(summary: "Retrieve a single template.")
-        .WithDescription(description: "Retrieve the template with the given id.")
-        .Produces<NoSQLTemplateGetOutputDTO>(statusCode: 200)
-         .WithMetadata(new OpenApiOperation
+        )
+        .WithMetadata(new OpenApiOperation
          {
-             Summary = "Update an existing car",
-             Description = "Updates the car details.",
-             RequestBody = new OpenApiRequestBody
-             {
-                 Content = new Dictionary<string, OpenApiMediaType>
-            {
-                {
-                    "application/json", new OpenApiMediaType
-                    {
-                        Example = new OpenApiObject
-                        {
-                            { "id", new OpenApiInteger(1) },
-                            { "make", new OpenApiString("Toyota") },
-                            { "model", new OpenApiString("Camry") }
-                        }
-                    }
-                }
-            }
-             },
-        //     Responses = new Dictionary<string, OpenApiResponse>
-        //{
-        //    { "200", new OpenApiResponse
-        //        {
-        //            Description = "Updated",
-        //            Content = new Dictionary<string, OpenApiMediaType>
-        //            {
-        //                {
-        //                    "application/json", new OpenApiMediaType
-        //                    {
-        //                        Example = new OpenApiObject
-        //                        {
-        //                            { "id", new OpenApiInteger(1) },
-        //                            { "make", new OpenApiString("Toyota") },
-        //                            { "model", new OpenApiString("Camry") }
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    },
-        //    { "204", new OpenApiResponse { Description = "No Content" } }
-        //}
+             Summary = "Retrieve a single template.",
+             Description = "Retrieve the template with the given id.",
+             Tags = new List<OpenApiTag> { new OpenApiTag { Name = "NoSQL" } },
+             Responses = NoSQLGetTemplatesResponseExamples.NoSQLGetTemplatesResponseExample(),
+             Parameters = NoSQLGetTemplatesRequestExamples.NoSQLGetTemplatesRequestParameterExamples()
+
          });
 
 
@@ -94,8 +57,9 @@ public class NoSQLTemplateEndpoints: ICarterModule
             handler: async (
                 [FromServices] NoSQLTemplateGetMapper mapper,
                 [FromServices] INoSQLTemplateService templateService
-            ) => {
-
+            ) =>
+            {
+                // TODO
                 Result<TemplateEntity> result = await templateService.ListAsync();
 
                 if (result.IsFailure)
@@ -107,10 +71,14 @@ public class NoSQLTemplateEndpoints: ICarterModule
 
                 return Results.Ok(value: result.Value);
             }
-        ).WithTags(tags: ["NoSQL"])
-        .WithSummary(summary: "Retrieve a list of templates.")
-        .WithDescription(description: "Retrieve the templates that match the given conditions.")
-        .Produces<NoSQLTemplateGetOutputDTO>(statusCode: 200);
+        )
+        .WithMetadata(new OpenApiOperation
+        {
+            Summary = "Retrieve a list of templates.",
+            Description = "Retrieve the templates that match the given conditions.",
+            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "NoSQL" } },       
+            Responses = NoSQLListTemplatesResponseExamples.NoSQLListTemplatesResponseExample(),
+        });
 
 
         #endregion
@@ -137,32 +105,15 @@ public class NoSQLTemplateEndpoints: ICarterModule
 
                 return Results.Created(uri: output.Id.ToString(), value: output);
             }
-        ).WithTags(tags: ["NoSQL"])
-        .WithSummary(summary: "Create a template")
-        .WithDescription(description: "Create a new template.")
-        .Produces<NoSQLTemplateGetOutputDTO>(statusCode: 201)
+        )
         .WithMetadata(new OpenApiOperation
         {
-            Summary = "Update an existing car",
-            Description = "Updates the car details.",
-            RequestBody = new OpenApiRequestBody
-            {
-                Content = new Dictionary<string, OpenApiMediaType>
-                {
-                    {
-                        "application/json", new OpenApiMediaType
-                        {
-                            Example = new OpenApiObject
-                            {
-                                { "id", new OpenApiInteger(1) },
-                                { "make", new OpenApiString("Toyota") },
-                                { "model", new OpenApiString("Camry") }
-                            }
-                        }
-                    }
-                }
-            }
-        });
+            Summary = "Create a template.",
+            Description = "Create a new template.",
+            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "NoSQL" } },
+            Responses = NoSQLPostTemplatesResponseExamples.NoSQLPostTemplatesResponseExample(),
+            RequestBody = NoSQLPostTemplatesRequestExamples.NoSQLPostTemplatesRequestExample()
+        }); 
         #endregion
 
         #region Put
@@ -190,10 +141,16 @@ public class NoSQLTemplateEndpoints: ICarterModule
 
                 return Results.Ok(value: result.Value);
             }
-        ).WithTags(tags: ["NoSQL"])
-        .WithSummary(summary: "Replace a template")
-        .WithDescription(description: "Replace the template with the given id with the one passed in the request body.")
-        .Produces<NoSQLTemplateGetOutputDTO>(statusCode: 200);
+        )
+        .WithMetadata(new OpenApiOperation
+        {
+            Summary = "Replace a template.",
+            Description = "Replace the template with the given id with the one passed in the request body.",
+            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "NoSQL" } },
+            Responses = NoSQLPutTemplatesResponseExamples.NoSQLPutTemplatesResponseExample(),
+            Parameters = NoSQLPutTemplatesRequestExamples.NoSQLPutTemplatesRequestParameterExamples(),
+            RequestBody = NoSQLPutTemplatesRequestExamples.NoSQLPutTemplatesRequestExample()
+        });
         #endregion
 
         #region Delete
@@ -217,10 +174,15 @@ public class NoSQLTemplateEndpoints: ICarterModule
 
                 return Results.Ok(value: result.Value);
             }
-        ).WithTags(tags: ["NoSQL"])
-        .WithSummary(summary: "Delete a template")
-        .WithDescription(description: "Delete the template with the given id.")
-        .Produces<NoSQLTemplateGetOutputDTO>(statusCode: 200);
+        )
+        .WithMetadata(new OpenApiOperation
+        {
+            Summary = "Delete a template.",
+            Description = "Delete the template with the given id.",
+            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "NoSQL" } },
+            Parameters = NoSQLDeleteTemplatesRequestExamples.NoSQLDeleteTemplatesRequestParameterExamples(),
+            Responses = NoSQLDeleteTemplatesResponseExamples.NoSQLDeleteTemplatesResponseExample(),
+        });
         #endregion
 
         #region Patch
@@ -249,10 +211,16 @@ public class NoSQLTemplateEndpoints: ICarterModule
 
                 return Results.Ok(value: result.Value);
             }
-        ).WithTags(tags: ["NoSQL"])
-        .WithSummary(summary: "Patch a template.")
-        .WithDescription(description: "Apply the given patches to the template with the given id.")
-        .Produces<NoSQLTemplateGetOutputDTO>(statusCode: 200);
+        )
+        .WithMetadata(new OpenApiOperation
+        {
+            Summary = "Patch a template.",
+            Description = "Apply the given patches to the template with the given id.",
+            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "NoSQL" } },
+            Parameters = NoSQLPatchTemplatesRequestExamples.NoSQLPatchTemplatesRequestParameterExamples(),
+            Responses = NoSQLPatchTemplatesResponseExamples.NoSQLPatchTemplatesResponseExample(),
+            RequestBody = NoSQLPatchTemplatesRequestExamples.NoSQLPatchTemplatesRequestExample()
+        });
         #endregion
     }
 }

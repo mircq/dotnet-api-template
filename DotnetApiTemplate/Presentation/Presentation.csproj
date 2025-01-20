@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <Folder Include="Endpoints\Vector\" />
-    <Folder Include="Examples/" />
     <Folder Include="Swagger\" />
   </ItemGroup>
 

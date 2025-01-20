@@ -2,7 +2,7 @@
 
 public static class Domain
 {
-    public static void InitializeDomain(this IServiceCollection services)
+    public static void AddDomain(this IServiceCollection services)
     {
 
     }

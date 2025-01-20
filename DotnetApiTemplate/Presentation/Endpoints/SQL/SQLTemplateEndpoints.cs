@@ -10,6 +10,7 @@ using Presentation.Mappers.Generic;
 using Application.Interfaces.SQL;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
+using Presentation.Examples.SQL;
 
 namespace Presentation.Endpoints;
 
@@ -39,11 +40,17 @@ public class SQLTemplateEndpoints : ICarterModule
 
                 return Results.Ok(value: result.Value);
             }
-        ).WithTags(tags: ["SQL"])
-        .WithSummary(summary: "Retrieve a single template.")
-        .WithDescription(description: "Retrieve the template with the given id.")
-        .Produces<SQLTemplateGetOutputDTO>(statusCode: 200);
-        
+        )
+        .WithMetadata(new OpenApiOperation
+        {
+            Summary = "Retrieve a single template.",
+            Description = "Retrieve the template with the given id.",
+            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "SQL" } },
+            Responses = SQLGetTemplatesResponseExamples.SQLGetTemplatesResponseExample(),
+            Parameters = SQLGetTemplatesRequestExamples.SQLGetTemplatesRequestParameterExamples()
+
+        });
+
         app.MapGet(
             pattern: "/sql/templates",
             handler: async (
@@ -62,10 +69,14 @@ public class SQLTemplateEndpoints : ICarterModule
 
                 return Results.Ok(value: result.Value);
             }
-        ).WithTags(tags: ["SQL"])
-        .WithSummary(summary: "Retrieve a list of templates.")
-        .WithDescription(description: "Retrieve the templates that match the given conditions.")
-        .Produces<SQLTemplateGetOutputDTO>(statusCode: 200);
+        )
+        .WithMetadata(new OpenApiOperation
+        {
+            Summary = "Retrieve a list of templates.",
+            Description = "Retrieve the templates that match the given conditions.",
+            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "SQL" } },
+            Responses = SQLListTemplatesResponseExamples.SQLListTemplatesResponseExample(),
+        });
 
 
         #endregion
@@ -92,10 +103,15 @@ public class SQLTemplateEndpoints : ICarterModule
 
                 return Results.Created(uri: output.Id.ToString(), value: output);
             }
-        ).WithTags(tags: ["SQL"])
-        .WithSummary(summary: "Create a template")
-        .WithDescription(description: "Create a new template.")
-        .Produces<SQLTemplatePostOutputDTO>(statusCode: 201);
+        )
+        .WithMetadata(new OpenApiOperation
+        {
+            Summary = "Create a template.",
+            Description = "Create a new template.",
+            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "SQL" } },
+            Responses = SQLPostTemplatesResponseExamples.SQLPostTemplatesResponseExample(),
+            RequestBody = SQLPostTemplatesRequestExamples.SQLPostTemplatesRequestExample()
+        });
         #endregion
 
         #region Put
@@ -122,11 +138,17 @@ public class SQLTemplateEndpoints : ICarterModule
 
                 return Results.Ok(value: result.Value);
             }
-        ).WithTags(tags: ["SQL"])
-        .WithSummary(summary: "Replace a template")
-        .WithDescription(description: "Replace the template with the given id with the one passed in the request body.")
-        .Produces<SQLTemplatePutOutputDTO>(statusCode: 200);
-        
+        )
+        .WithMetadata(new OpenApiOperation
+        {
+            Summary = "Replace a template.",
+            Description = "Replace the template with the given id with the one passed in the request body.",
+            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "SQL" } },
+            Responses = SQLPutTemplatesResponseExamples.SQLPutTemplatesResponseExample(),
+            Parameters = SQLPutTemplatesRequestExamples.SQLPutTemplatesRequestParameterExamples(),
+            RequestBody = SQLPutTemplatesRequestExamples.SQLPutTemplatesRequestExample()
+        });
+
         #endregion
 
         #region Delete
@@ -150,10 +172,15 @@ public class SQLTemplateEndpoints : ICarterModule
 
                 return Results.Ok(value: result.Value);
             }
-        ).WithTags(tags: ["SQL"])
-        .WithSummary(summary: "Delete a template")
-        .WithDescription(description: "Delete the template with the given id.")
-        .Produces<SQLTemplateDeleteOutputDTO>(statusCode: 200);
+        )
+        .WithMetadata(new OpenApiOperation
+        {
+            Summary = "Delete a template.",
+            Description = "Delete the template with the given id.",
+            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "SQL" } },
+            Parameters = SQLDeleteTemplatesRequestExamples.SQLDeleteTemplatesRequestParameterExamples(),
+            Responses = SQLDeleteTemplatesResponseExamples.SQLDeleteTemplatesResponseExample(),
+        });
         #endregion
 
         #region Patch
@@ -182,10 +209,16 @@ public class SQLTemplateEndpoints : ICarterModule
 
                 return Results.Ok(value: result.Value);
             }
-        ).WithTags(tags: ["SQL"])
-        .WithSummary(summary: "Patch a template.")
-        .WithDescription(description: "Apply the given patches to the template with the given id.")
-        .Produces<SQLTemplatePatchOutputDTO>(statusCode: 200);
+        )
+        .WithMetadata(new OpenApiOperation
+        {
+            Summary = "Patch a template.",
+            Description = "Apply the given patches to the template with the given id.",
+            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "SQL" } },
+            Parameters = SQLPatchTemplatesRequestExamples.SQLPatchTemplatesRequestParameterExamples(),
+            Responses = SQLPatchTemplatesResponseExamples.SQLPatchTemplatesResponseExample(),
+            RequestBody = SQLPatchTemplatesRequestExamples.SQLPatchTemplatesRequestExample()
+        });
         #endregion
     }
 }
