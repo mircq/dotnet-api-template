@@ -2,21 +2,13 @@
 
 public class NoSQLDatabaseSettings
 {
-    public string NoSQLDatabaseHost { get; }
-    public int NoSQLDatabasePort { get; }
+    public string Host { get; set;  }
 
-    public string NoSQLDatabaseUser { get; }
+    public int Port { get; set;  }
 
-    public string NoSQLDatabasePassword { get; }
+    public string User { get; set; }
 
-    public NoSQLDatabaseSettings(IConfiguration configuration)
-    {
+    public string Password { get; set; }
 
-
-        NoSQLDatabaseHost = configuration["NO_SQL_DATABASE_HOST"] ?? throw new ArgumentNullException("Database connection string not found.");
-        // TODO manage missing case
-        NoSQLDatabasePort = Int32.Parse(configuration["NO_SQL_DATABASE_PORT"]);
-        NoSQLDatabaseUser = configuration["NO_SQL_DATABASE_USER"] ?? throw new ArgumentNullException("Database connection string not found.");
-        NoSQLDatabasePassword = configuration["NO_SQL_DATABASE_PASSWORD"] ?? throw new ArgumentNullException("Database connection string not found.");
-    }
+    public string Name { get; set; }
 }

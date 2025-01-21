@@ -1,21 +1,17 @@
 ﻿using Domain.Entities;
 using Domain.Errors;
 using Domain.Result;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
 using Persistence.DbContexts;
 using Persistence.Interfaces;
 
 namespace Persistence.Repositories;
 
-public class TemplateRepository: ITemplateRepository
+public class SQLTemplateRepository(SQLDbContext context) : ISQLTemplateRepository
 {
 
-    private readonly AppDbContext _context;
-
-    public TemplateRepository(AppDbContext context)
-    {
-        _context = context;
-    }
+    private readonly SQLDbContext _context = context;
 
     #region Get
     public async Task<Result<TemplateEntity>> GetAsync(Guid id)
@@ -95,7 +91,7 @@ public class TemplateRepository: ITemplateRepository
     #endregion
 
     #region Patch
-    public async Task<Result<TemplateEntity>> PatchAsync(Guid id, List<PatchEntity> patches)
+    public async Task<Result<TemplateEntity>> PatchAsync(Guid id, JsonPatchDocument patchDocument)
     {
 
         TemplateEntity? entity = await _context.Templates.FindAsync(id);
@@ -109,8 +105,7 @@ public class TemplateRepository: ITemplateRepository
             return errorResult;
         }
 
-        // TODO
-        //patchDoc.ApplyTo(car, ModelState);
+        patchDocument.ApplyTo(objectToApplyTo: entity);
 
         return entity;
     }

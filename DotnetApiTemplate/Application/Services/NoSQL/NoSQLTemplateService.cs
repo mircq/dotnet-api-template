@@ -1,13 +1,14 @@
 ﻿using Application.Interfaces.NoSQL;
 using Domain.Entities;
 using Domain.Result;
+using Microsoft.AspNetCore.JsonPatch;
 using Persistence.Interfaces;
 
 namespace Application.Services.NoSQL;
 
 public class NoSQLTemplateService: INoSQLTemplateService
 {
-    private readonly ITemplateRepository _templateRepository;
+    private readonly INoSQLTemplateRepository _templateRepository;
 
     #region Get
 
@@ -57,9 +58,9 @@ public class NoSQLTemplateService: INoSQLTemplateService
 
     #region Patch
 
-    public async Task<Result<TemplateEntity>> PatchAsync(Guid id, List<PatchEntity> patches)
+    public async Task<Result<TemplateEntity>> PatchAsync(Guid id, JsonPatchDocument patchDocument)
     {
-        Result<TemplateEntity> result = await _templateRepository.PatchAsync(id: id, patches: patches);
+        Result<TemplateEntity> result = await _templateRepository.PatchAsync(id: id, patchDocument: patchDocument);
 
         return result;
     }

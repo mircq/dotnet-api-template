@@ -11,6 +11,7 @@ using Application.Interfaces.SQL;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Presentation.Examples.SQL;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace Presentation.Endpoints;
 
@@ -33,10 +34,10 @@ public class SQLTemplateEndpoints : ICarterModule
 
                 if (result.IsFailure)
                 {
-                    return Results.Json(data: result.Error.Message, statusCode: result.Error.StatusCode);
+                    return Results.Json(data: result?.Error?.Message, statusCode: result?.Error?.StatusCode);
                 }
 
-                SQLTemplateGetOutputDTO output = mapper.ToDTO(entity: result.Value);
+                SQLTemplateGetOutputDTO output = mapper.ToDTO(entity: result?.Value);
 
                 return Results.Ok(value: result.Value);
             }
@@ -62,10 +63,10 @@ public class SQLTemplateEndpoints : ICarterModule
 
                 if (result.IsFailure)
                 {
-                    return Results.Json(data: result.Error.Message, statusCode: result.Error.StatusCode);
+                    return Results.Json(data: result?.Error?.Message, statusCode: result?.Error?.StatusCode);
                 }
 
-                SQLTemplateGetOutputDTO output = mapper.ToDTO(entity: result.Value);
+                SQLTemplateGetOutputDTO output = mapper.ToDTO(entity: result?.Value);
 
                 return Results.Ok(value: result.Value);
             }
@@ -96,10 +97,10 @@ public class SQLTemplateEndpoints : ICarterModule
 
                 if (result.IsFailure)
                 {
-                    return Results.Json(data: result.Error.Message, statusCode: result.Error.StatusCode);
+                    return Results.Json(data: result?.Error?.Message, statusCode: result?.Error?.StatusCode);
                 }
 
-                SQLTemplatePostOutputDTO output = mapper.ToDTO(entity: result.Value);
+                SQLTemplatePostOutputDTO output = mapper.ToDTO(entity: result?.Value);
 
                 return Results.Created(uri: output.Id.ToString(), value: output);
             }
@@ -131,10 +132,10 @@ public class SQLTemplateEndpoints : ICarterModule
 
                 if (result.IsFailure)
                 {
-                    return Results.Json(data: result.Error.Message, statusCode: result.Error.StatusCode);
+                    return Results.Json(data: result?.Error?.Message, statusCode: result?.Error?.StatusCode);
                 }
 
-                SQLTemplatePutOutputDTO output = mapper.ToDTO(entity: result.Value);
+                SQLTemplatePutOutputDTO output = mapper.ToDTO(entity: result?.Value);
 
                 return Results.Ok(value: result.Value);
             }
@@ -165,10 +166,10 @@ public class SQLTemplateEndpoints : ICarterModule
 
                 if (result.IsFailure)
                 {
-                    return Results.Json(data: result.Error.Message, statusCode: result.Error.StatusCode);
+                    return Results.Json(data: result?.Error?.Message, statusCode: result?.Error?.StatusCode);
                 }
 
-                SQLTemplateDeleteOutputDTO output = mapper.ToDTO(entity: result.Value);
+                SQLTemplateDeleteOutputDTO output = mapper.ToDTO(entity: result?.Value);
 
                 return Results.Ok(value: result.Value);
             }
@@ -189,23 +190,21 @@ public class SQLTemplateEndpoints : ICarterModule
             pattern: "/sql/templates/{id}",
             handler: async (
                 [FromRoute] Guid id,
-                [FromBody] PatchDTO body,
+                [FromBody] JsonPatchDocument patchDocument,
                 [FromServices] SQLTemplatePatchMapper mapper,
                 [FromServices] PatchMapper patchMapper,
                 [FromServices] ISQLTemplateService templateService
         ) =>
             {
 
-                List<PatchEntity> patches = [patchMapper.ToEntity(dto: body)]; ;
-
-                Result<TemplateEntity> result = await templateService.PatchAsync(id: id, patches: patches);
+                Result<TemplateEntity> result = await templateService.PatchAsync(id: id, patchDocument: patchDocument);
 
                 if (result.IsFailure)
                 {
-                    return Results.Json(data: result.Error.Message, statusCode: result.Error.StatusCode);
+                    return Results.Json(data: result?.Error?.Message, statusCode: result?.Error?.StatusCode);
                 }
 
-                SQLTemplatePatchOutputDTO output = mapper.ToDTO(entity: result.Value);
+                SQLTemplatePatchOutputDTO output = mapper.ToDTO(entity: result?.Value);
 
                 return Results.Ok(value: result.Value);
             }

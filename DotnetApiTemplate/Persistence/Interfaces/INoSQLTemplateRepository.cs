@@ -1,9 +1,10 @@
 ﻿using Domain.Entities;
 using Domain.Result;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace Persistence.Interfaces;
 
-public interface ITemplateRepository
+public interface INoSQLTemplateRepository
 {
     #region Get
     Task<Result<TemplateEntity>> GetAsync(Guid id);
@@ -22,7 +23,6 @@ public interface ITemplateRepository
     #endregion
 
     #region Patch
-    Task<Result<TemplateEntity>> PatchAsync(Guid id, List<PatchEntity> patches);
+    Task<Result<TemplateEntity>> PatchAsync(Guid id, JsonPatchDocument patchDocument);
     #endregion
-
 }

@@ -2,7 +2,10 @@
 
 public class GenericErrors
 {
-    public static Error GenericError = new Error(message: "Error message", statusCode: 500);
+    public static Error GenericError(string message)
+    {
+        return new Error(message: message, statusCode: 500);
+    }
 
     public static Error NotFoundError(string entityType, Guid id)
     {

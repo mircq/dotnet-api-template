@@ -1,17 +1,15 @@
 ﻿using Application.Interfaces.NoSQL;
 using Carter;
-using Carter.OpenApi;
 using Domain.Entities;
 using Domain.Result;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Presentation.DTOs.Generic;
 using Presentation.DTOs.NoSQL;
 using Presentation.Examples.NoSQL;
 using Presentation.Mappers.Generic;
 using Presentation.Mappers.NoSQL;
-using Presentation.Examples.NoSQL;
 
 namespace Presentation.Endpoints;
 
@@ -191,16 +189,13 @@ public class NoSQLTemplateEndpoints: ICarterModule
             pattern: "/nosql/templates/{id}",
             handler: async (
                 [FromRoute] Guid id,
-                [FromBody] PatchDTO body,
+                [FromBody] JsonPatchDocument patchDocument,
                 [FromServices] NoSQLTemplatePatchMapper mapper,
                 [FromServices] PatchMapper patchMapper,
                 [FromServices] INoSQLTemplateService templateService
             ) => {
 
-                // TODO considered one patch only
-                List<PatchEntity> entity = [patchMapper.ToEntity(dto: body)];
-
-                Result<TemplateEntity> result = await templateService.PatchAsync(id: id, patches: entity);
+                Result<TemplateEntity> result = await templateService.PatchAsync(id: id, patchDocument: patchDocument);
 
                 if (result.IsFailure)
                 {

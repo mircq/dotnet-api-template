@@ -1,5 +1,6 @@
 ﻿using Domain.Entities;
 using Domain.Result;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace Application.Interfaces.SQL;
 
@@ -24,6 +25,6 @@ public interface ISQLTemplateService
     #endregion
 
     #region Patch
-    public Task<Result<TemplateEntity>> PatchAsync(Guid id, List<PatchEntity> patches);
+    public Task<Result<TemplateEntity>> PatchAsync(Guid id, JsonPatchDocument patchDocument);
     #endregion
 }

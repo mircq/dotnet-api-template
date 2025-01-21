@@ -5,6 +5,8 @@ using Persistence.Settings;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Repositories;
 using Persistence.Interfaces;
+using MongoDB.Driver;
+using System;
 
 namespace Persistence;
 
@@ -14,18 +16,36 @@ public static class Persistence
     public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
     {
 
+        #region SQL Database
+
         SQLDatabaseSettings SQLDatabaseSettings = new SQLDatabaseSettings();
         configuration.GetSection("SQLDatabaseSettings").Bind(instance: SQLDatabaseSettings);
 
-        services.AddDbContext<AppDbContext>((serviceProvider, options) =>
+        services.AddDbContext<SQLDbContext>((serviceProvider, options) =>
         {
-            string connectionString = $"Host={SQLDatabaseSettings.Host};Port={SQLDatabaseSettings.Port};Database={SQLDatabaseSettings.Name};Username={SQLDatabaseSettings.User};Password={SQLDatabaseSettings.Password};";
+            string SQLconnectionString = $"Host={SQLDatabaseSettings.Host};Port={SQLDatabaseSettings.Port};Database={SQLDatabaseSettings.Name};Username={SQLDatabaseSettings.User};Password={SQLDatabaseSettings.Password};";
             
             // Use the connection string with the appropriate database provider
-            options.UseNpgsql(connectionString: connectionString); 
+            options.UseNpgsql(connectionString: SQLconnectionString); 
         });
 
-        services.AddScoped<ITemplateRepository, TemplateRepository>();
+        #endregion
+
+        #region NoSQL Database
+
+        NoSQLDatabaseSettings noSQLDatabaseSettings = new NoSQLDatabaseSettings();
+        configuration.GetSection("NoSQLDatabaseSettings").Bind(instance: noSQLDatabaseSettings);
+
+        string NoSQLConnectionString = $"mongodb://{noSQLDatabaseSettings.User}:{noSQLDatabaseSettings.Password}@{noSQLDatabaseSettings.Host}:{noSQLDatabaseSettings.Port}";
+
+        MongoClient client = new MongoClient(connectionString: NoSQLConnectionString);
+        IMongoDatabase database = client.GetDatabase(noSQLDatabaseSettings.Name);
+
+        services.AddSingleton(database);
+
+        #endregion
+
+        services.AddScoped<ISQLTemplateRepository, SQLTemplateRepository>();
 
         return services;
     }
