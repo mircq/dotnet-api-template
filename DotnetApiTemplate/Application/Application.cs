@@ -1,5 +1,7 @@
-﻿using Application.Interfaces.NoSQL;
+﻿using Application.Interfaces.MinIO;
+using Application.Interfaces.NoSQL;
 using Application.Interfaces.SQL;
+using Application.Services.MinIO;
 using Application.Services.NoSQL;
 using Application.Services.SQL;
 
@@ -13,6 +15,7 @@ public static class Application
 
         services.AddScoped<ISQLTemplateService, SQLTemplateService>();
         services.AddScoped<INoSQLTemplateService, NoSQLTemplateService>();
+        services.AddScoped<IMinIOService, MinIOService>();
 
         return services;
     }

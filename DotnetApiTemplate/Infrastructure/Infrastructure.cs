@@ -14,6 +14,8 @@ public static class Infrastructure
 
         services.AddHttpClient<IKeycloakClient, KeycloakClient>();
 
+        services.AddScoped<IMinIOClient, MinIOClient>();
+
         return services;
     }
 }
