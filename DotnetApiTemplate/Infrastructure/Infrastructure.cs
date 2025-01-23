@@ -9,12 +9,20 @@ public static class Infrastructure
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        #region Keycloak
         KeycloakSettings keycloakSettings = new KeycloakSettings();
         configuration.GetSection("KeycloakSettings").Bind(instance: keycloakSettings);
 
         services.AddHttpClient<IKeycloakClient, KeycloakClient>();
+        #endregion
+
+        #region MinIO
+        MinIOSettings minIOSettings = new MinIOSettings();
+        configuration.GetSection("MinIOSettings").Bind(instance: minIOSettings);
+
 
         services.AddScoped<IMinIOClient, MinIOClient>();
+        #endregion
 
         return services;
     }

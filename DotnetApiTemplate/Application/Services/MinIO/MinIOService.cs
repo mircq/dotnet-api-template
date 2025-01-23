@@ -19,4 +19,11 @@ public class MinIOService(IMinIOClient minioClient, ILogger<MinIOService> logger
         return await _minioClient.GetAsync(path: path);
     }
     #endregion
+
+    #region Get
+    public async Task<Result<string>> PostAsync(string path, Stream stream)
+    {
+        return await _minioClient.PostAsync(path: path, stream: stream);
+    }
+    #endregion
 }

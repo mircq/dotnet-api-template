@@ -1,16 +1,22 @@
 ﻿using System.Globalization;
 using System.IO;
+using System.IO.Pipes;
+using System.Net.Mime;
 using System.Security.AccessControl;
 using System.Text;
 using System.Xml.Linq;
 using Domain.Errors;
 using Domain.Result;
 using Infrastructure.Interfaces;
+using Infrastructure.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing.Constraints;
 using Minio;
 using Minio.DataModel.Args;
 using Minio.Exceptions;
+using MimeDetective;
+using MimeDetective.Engine;
+using System.Collections.Immutable;
 
 namespace Infrastructure.Clients;
 
@@ -18,17 +24,26 @@ public class MinIOClient: IMinIOClient
 {
 
     private IMinioClient minioClient;
+    private string bucketName;
     private readonly ILogger<MinIOClient> _logger;
 
-    public MinIOClient(ILogger<MinIOClient> logger)
+    public MinIOClient(MinIOSettings settings, ILogger<MinIOClient> logger)
     {
-        _logger = logger;
-
         minioClient = new MinioClient()
-            .WithEndpoint(endpoint: "localhost:9000")
-            .WithCredentials(accessKey: "dG9BvRBdhrGoSN2S5CaV", secretKey: "saMrqqd5N5izgQFQ5qT2jOB4DG4udvG1gJrcQ9y7")
+            .WithEndpoint(endpoint: $"{settings.Host}:{settings.Port}")
+            .WithCredentials(accessKey: settings.AccessKey, secretKey: settings.SecretKey)
             .WithSSL()
             .Build();
+
+        bucketName = settings.BucketName;
+
+        IContentInspector Inspector = new ContentInspectorBuilder()
+        {
+            Definitions = MimeDetective.Definitions.DefaultDefinitions.All()
+        }.Build();
+
+        _logger = logger;
+
     }
 
     #region Get
@@ -68,7 +83,7 @@ public class MinIOClient: IMinIOClient
 
             MemoryStream memoryStream = new MemoryStream();
             GetObjectArgs getArgs = new GetObjectArgs()
-                    .WithBucket(bucket: "prova")
+                    .WithBucket(bucket: bucketName)
                     .WithObject(obj: path)
                     .WithCallbackStream(async stream =>
                     {
@@ -82,7 +97,7 @@ public class MinIOClient: IMinIOClient
         }
         catch (BucketNotFoundException e)
         {
-            return GenericErrors.NotFoundError(entityType: "bucket", id: "prova");
+            return GenericErrors.NotFoundError(entityType: "bucket", id: bucketName);
         }
         catch (ObjectNotFoundException e)
         {
@@ -98,7 +113,40 @@ public class MinIOClient: IMinIOClient
     #endregion
 
     #region Post
+    public async Task<Result<string>> PostAsync(string path, Stream stream)
+    {
 
+        BucketExistsArgs bucketArgs = new BucketExistsArgs().WithBucket(bucket: bucketName);
+
+        bool bucketExists = await minioClient.BucketExistsAsync(
+                args: bucketArgs
+        );
+
+        if (!bucketExists)
+        {
+            return GenericErrors.NotFoundError(entityType: "bucket", id: bucketName);
+        }
+
+        IContentInspector Inspector = new ContentInspectorBuilder()
+        {
+            Definitions = MimeDetective.Definitions.DefaultDefinitions.All()
+        }.Build();
+
+        ImmutableArray<DefinitionMatch> results = Inspector.Inspect(content: stream);
+        ImmutableArray<MimeTypeMatch> resultsByMimeType = results.ByMimeType();
+        string contentType = resultsByMimeType.First()?.MimeType ?? "application/octet-stream";
+
+        PutObjectArgs putObjectArgs = new PutObjectArgs()
+                                            .WithBucket(bucket: bucketName)
+                                            .WithObject(obj: path)
+                                            .WithStreamData(data: stream)
+                                            .WithObjectSize(size: stream.Length)
+                                            .WithContentType(type: contentType);
+
+        await minioClient.PutObjectAsync(args: putObjectArgs);
+
+        return path;
+    }
 
     #endregion
 }

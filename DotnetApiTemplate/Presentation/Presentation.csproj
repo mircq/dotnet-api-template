@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="DTOs\Graph\" />
+    <Folder Include="DTOs\Job\" />
+    <Folder Include="DTOs\Vector\" />
+    <Folder Include="Endpoints\Graph\" />
     <Folder Include="Endpoints\Vector\" />
     <Folder Include="Swagger\" />
   </ItemGroup>

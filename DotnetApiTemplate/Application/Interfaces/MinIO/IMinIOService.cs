@@ -10,5 +10,6 @@ public interface IMinIOService
     #endregion
 
     #region Post
+    public Task<Result<string>> PostAsync(string path, Stream stream);
     #endregion
 }
