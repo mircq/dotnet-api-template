@@ -1,6 +1,9 @@
-﻿namespace Infrastructure.Interfaces;
+﻿using Domain.Entities;
+using Domain.Result;
 
-public interface IRabbitMQClient
+namespace Infrastructure.Interfaces;
+
+public interface IRabbitMQClient<T>
 {
-    public Task<Results<T> Enqueue(); 
+    public Task<Result<T>> EnqueueAsync(JobEntity entity); 
 }

@@ -10,4 +10,5 @@ public class RabbitMQSettings
 
     public string Password { get; set; }
 
+    public string QueueName { get; set; }
 }
