@@ -20,6 +20,7 @@ public static class Infrastructure
         MinIOSettings minIOSettings = new MinIOSettings();
         configuration.GetSection("MinIOSettings").Bind(instance: minIOSettings);
 
+        services.AddSingleton<MinIOSettings>();
 
         services.AddScoped<IMinIOClient, MinIOClient>();
         #endregion
