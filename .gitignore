@@ -11,3 +11,10 @@ Presentation/bin
 Presentation/obj
 obj
 bin
+/redis_data
+/postgres_data
+/qdrant_data
+/minio_data
+/mongodb_data
+/neo4j_data
+/ollama_embedder_data
