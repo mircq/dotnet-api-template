@@ -11,6 +11,14 @@ public class JobService<T>(IRabbitMQClient<T> rabbitClient, ILogger<MinIOService
     private readonly IRabbitMQClient<T> _rabbitClient = rabbitClient;
     private readonly ILogger<MinIOService> _logger = logger;
 
+    #region Get
+    public async Task<Result<T>> GetAsync(Guid id)
+    {
+        throw new NotImplementedException(),
+    }
+    #endregion
+
+    #region Post
     public async Task<Result<T>> EnqueueAsync(JobEntity entity)
     {
         _logger.LogInformation(message: "Start");
@@ -21,4 +29,5 @@ public class JobService<T>(IRabbitMQClient<T> rabbitClient, ILogger<MinIOService
 
         return result;
     }
+    #endregion
 }

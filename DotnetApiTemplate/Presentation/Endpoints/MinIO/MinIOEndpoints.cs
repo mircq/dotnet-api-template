@@ -52,7 +52,8 @@ public class MinIOEndpoints : ICarterModule
             pattern: "/minio",
             handler: async (
                 IFormFile file,
-                [FromBody] MinIOPostInputDTO dto,
+                string filename,
+                string basePath,
                 [FromServices] IMinIOService minioService
             ) =>
             {
@@ -64,7 +65,7 @@ public class MinIOEndpoints : ICarterModule
 
                 // Upload the file to MinIO
                 using Stream fileStream = file.OpenReadStream();
-                Result<string> result = await minioService.PostAsync(path: $"{dto.BasePath}/{dto.Filename}", stream: fileStream);
+                Result<string> result = await minioService.PostAsync(path: $"{basePath}/{filename}", stream: fileStream);
                 //Result<Stream> result = await minioService.PostAsync(bucketName, objectName, fileStream, contentType);
 
                 if (result.IsFailure)
