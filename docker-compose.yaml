@@ -223,7 +223,7 @@ services:
     environment:
       - MINIO_ROOT_USER=minio_user
       - MINIO_ROOT_PASSWORD=minio_password
-      - MINIO_DEFAULT_BUCKETS=minio_bucket
+      - MINIO_DEFAULT_BUCKETS=bucket
 
 networks:
   template-network:

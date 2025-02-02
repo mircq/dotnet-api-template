@@ -14,7 +14,7 @@ public class JobService<T>(IRabbitMQClient<T> rabbitClient, ILogger<MinIOService
     #region Get
     public async Task<Result<T>> GetAsync(Guid id)
     {
-        throw new NotImplementedException(),
+        throw new NotImplementedException();
     }
     #endregion
 
