@@ -1,0 +1,40 @@
+using Microsoft.OpenApi.Models;
+
+namespace Presentation.Examples.SQL;
+
+public class SQLListTemplatesRequestExamples
+{
+    public static List<OpenApiParameter> SQLListTemplatesRequestParameterExamples()
+    {
+        return new List<OpenApiParameter>
+        {
+            Content = new Dictionary<string, OpenApiMediaType>
+            {
+                {
+                    "application/json", new OpenApiMediaType
+                    {
+                        Example = new OpenApiArray
+                        {
+                            new OpenApiObject
+                            {
+                                { "SortBy", new OpenApiString("description") },
+                                { "SortOrder", new OpenApiString("asc") },
+                                { "PageNumber", new OpenApiInt(1) },
+                                { "PageSize", new OpenApiInt(10) },
+                                { "Filters": new OpenApiArray(
+                                    {
+                                        new OpenAPIObject(
+                                            { "Key": new OpenApiString("description")},
+                                            { "Value": new OpenApiString("Sample description")},
+                                            { "Operator": new OpenApiString("==")},
+                                        )
+                                    }
+                                )}
+                            }
+                        }
+                    }
+                }
+            }
+        };
+    }
+}

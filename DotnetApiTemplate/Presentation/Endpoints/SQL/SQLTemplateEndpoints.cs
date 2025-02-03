@@ -52,34 +52,6 @@ public class SQLTemplateEndpoints : ICarterModule
 
         });
 
-        app.MapGet(
-            pattern: "/sql/templates",
-            handler: async (
-                [FromServices] SQLTemplateGetMapper mapper,
-                [FromServices] ISQLTemplateService templateService
-            ) => {
-
-                Result<TemplateEntity> result = await templateService.ListAsync();
-
-                if (result.IsFailure)
-                {
-                    return Results.Json(data: result?.Error?.Message, statusCode: result?.Error?.StatusCode);
-                }
-
-                SQLTemplateGetOutputDTO output = mapper.ToDTO(entity: result?.Value);
-
-                return Results.Ok(value: result.Value);
-            }
-        )
-        .WithMetadata(new OpenApiOperation
-        {
-            Summary = "Retrieve a list of templates.",
-            Description = "Retrieve the templates that match the given conditions.",
-            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "SQL" } },
-            Responses = SQLListTemplatesResponseExamples.SQLListTemplatesResponseExample(),
-        });
-
-
         #endregion
 
         #region Post
@@ -113,6 +85,38 @@ public class SQLTemplateEndpoints : ICarterModule
             Responses = SQLPostTemplatesResponseExamples.SQLPostTemplatesResponseExample(),
             RequestBody = SQLPostTemplatesRequestExamples.SQLPostTemplatesRequestExample()
         });
+
+        app.MapPost(
+            pattern: "/sql/templates/filter",
+            handler: async (
+                [FromBody] FilterDTO dto,
+                [FromServices] SQLTemplateListMapper mapper,
+                [FromServices] FilterMapper filterMapper,
+                [FromServices] ISQLTemplateService templateService
+            ) => {
+
+                FilterEntity filter = filterMapper.ToEntity(dto: dto)
+
+                Result<List<TemplateEntity>> result = await templateService.ListAsync(filter: filter);
+
+                if (result.IsFailure)
+                {
+                    return Results.Json(data: result?.Error?.Message, statusCode: result?.Error?.StatusCode);
+                }
+
+                List<SQLTemplateListOutputDTO> output = result.Value.Select( x => mapper.ToDTO(entity: x)).ToList();
+
+                return Results.Ok(value: result.Value);
+            }
+        )
+        .WithMetadata(new OpenApiOperation
+        {
+            Summary = "Retrieve a list of templates.",
+            Description = "Retrieve the templates that match the given conditions.",
+            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "SQL" } },
+            Responses = SQLListTemplatesResponseExamples.SQLListTemplatesResponseExample(),
+        });
+
         #endregion
 
         #region Put

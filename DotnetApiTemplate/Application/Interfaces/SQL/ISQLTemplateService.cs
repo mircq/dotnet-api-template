@@ -9,11 +9,12 @@ public interface ISQLTemplateService
     #region Get
     public Task<Result<TemplateEntity>> GetAsync(Guid id);
 
-    public Task<Result<TemplateEntity>> ListAsync();
     #endregion
 
     #region Post
     public Task<Result<TemplateEntity>> PostAsync(TemplateEntity entity);
+
+    public Task<Result<List<TemplateEntity>>> ListAsync(FilterEntity filter);
     #endregion
 
     #region Put

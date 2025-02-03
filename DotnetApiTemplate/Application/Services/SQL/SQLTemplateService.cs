@@ -25,10 +25,16 @@ public class SQLTemplateService(ISQLTemplateRepository templateRepository, ILogg
         return result;
     }
 
-    public async Task<Result<TemplateEntity>> ListAsync()
+    public async Task<Result<TemplateEntity>> ListAsync(FilterEntity filter)
     {
-        // TODO
-        throw new NotImplementedException();
+        _logger.LogInformation(message: $"Start");
+        _logger.LogDebug(message: $"Input params: id={id}");
+
+        Result<TemplateEntity> result = await _templateRepository.ListAsync(filter: filter);
+
+        _logger.LogInformation(message: "End");
+
+        return result;
     }
 
     #endregion
