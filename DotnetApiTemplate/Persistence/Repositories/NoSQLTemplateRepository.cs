@@ -4,10 +4,11 @@ using Domain.Result;
 using MongoDB.Driver;
 using Microsoft.AspNetCore.JsonPatch;
 using Persistence.DbContexts;
+using Application.Repositories.NoSQL;
 
 namespace Persistence.Repositories;
 
-public class NoSQLTemplateRepository(NoSQLDbContext context, IMongoDatabase database, string collectionName)
+public class NoSQLTemplateRepository(NoSQLDbContext context, IMongoDatabase database, string collectionName): INoSQLTemplateRepository
 {
     private readonly IMongoCollection<TemplateEntity> _collection = database.GetCollection<TemplateEntity>(name: collectionName);
     private readonly NoSQLDbContext _context = context;
@@ -123,6 +124,16 @@ public class NoSQLTemplateRepository(NoSQLDbContext context, IMongoDatabase data
         findResult.Id = id;
 
         return findResult;
+    }
+
+    public Task<Result<TemplateEntity>> PostAsync(TemplateEntity entity)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Result<TemplateEntity>> PutAsync(Guid id, TemplateEntity entity)
+    {
+        throw new NotImplementedException();
     }
     #endregion
 }

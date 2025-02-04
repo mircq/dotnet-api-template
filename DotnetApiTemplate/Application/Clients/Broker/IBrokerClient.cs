@@ -1,9 +1,9 @@
 ﻿using Domain.Entities;
 using Domain.Result;
 
-namespace Infrastructure.Interfaces;
+namespace Application.Clients.Broker;
 
-public interface IRabbitMQClient<T>
+public interface IBrokerClient<T>
 {
     public Task<Result<T>> EnqueueAsync(JobEntity entity); 
 }

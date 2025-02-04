@@ -1,10 +1,11 @@
-﻿using Domain.Entities;
+﻿using Application.Repositories.SQL;
+using Domain.Entities;
 using Domain.Errors;
 using Domain.Result;
 using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.EntityFrameworkCore;
+
 using Persistence.DbContexts;
-using Persistence.Interfaces;
+
 
 namespace Persistence.Repositories;
 

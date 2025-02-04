@@ -16,13 +16,13 @@ public static class Infrastructure
         services.AddHttpClient<IKeycloakClient, KeycloakClient>();
         #endregion
 
-        #region MinIO
+        #region Storage
         MinIOSettings minIOSettings = new MinIOSettings();
         configuration.GetSection("MinIOSettings").Bind(instance: minIOSettings);
 
         services.AddSingleton<MinIOSettings>();
 
-        services.AddScoped<IMinIOClient, MinIOClient>();
+        services.AddScoped<IStorageClient, StorageClient>();
         #endregion
 
         return services;

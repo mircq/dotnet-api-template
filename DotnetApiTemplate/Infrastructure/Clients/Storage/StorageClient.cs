@@ -7,7 +7,6 @@ using System.Text;
 using System.Xml.Linq;
 using Domain.Errors;
 using Domain.Result;
-using Infrastructure.Interfaces;
 using Infrastructure.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing.Constraints;
@@ -17,17 +16,18 @@ using Minio.Exceptions;
 using MimeDetective;
 using MimeDetective.Engine;
 using System.Collections.Immutable;
+using Application.Clients.Storage;
 
 namespace Infrastructure.Clients;
 
-public class MinIOClient: IMinIOClient
+public class StorageClient: IStorageClient
 {
 
     private IMinioClient minioClient;
     private string bucketName;
-    private readonly ILogger<MinIOClient> _logger;
+    private readonly ILogger<StorageClient> _logger;
 
-    public MinIOClient(MinIOSettings settings, ILogger<MinIOClient> logger)
+    public StorageClient(MinIOSettings settings, ILogger<StorageClient> logger)
     {
         minioClient = new MinioClient()
             .WithEndpoint(endpoint: $"{settings.Host}:{settings.Port}")

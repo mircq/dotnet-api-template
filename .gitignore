@@ -18,3 +18,4 @@ bin
 /mongodb_data
 /neo4j_data
 /ollama_embedder_data
+launch.json

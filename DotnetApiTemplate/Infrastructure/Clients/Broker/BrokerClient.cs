@@ -6,18 +6,17 @@ using RabbitMQ.Client.Events;
 using System.Collections.Generic;
 using System.Text.Json;
 using Domain.Result;
-using Infrastructure.Interfaces;
 using Newtonsoft.Json;
 using Domain.Entities;
 
 namespace Infrastructure.Clients;
 
-public class RabbitMQClient<T>: IRabbitMQClient<T>
+public class BrokerClient<T>: IBrokerClient<T>
 {
     private readonly ConnectionFactory _connectionFactory;
     private readonly string _queueName;
 
-    public RabbitMQClient(RabbitMQSettings settings)
+    public BrokerClient(RabbitMQSettings settings)
     {
         _connectionFactory = new ConnectionFactory
         {

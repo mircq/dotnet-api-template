@@ -4,9 +4,10 @@ using Persistence.DbContexts;
 using Persistence.Settings;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Repositories;
-using Persistence.Interfaces;
+using Application.Repositories;
 using MongoDB.Driver;
 using System;
+using Application.Repositories.SQL;
 
 namespace Persistence;
 

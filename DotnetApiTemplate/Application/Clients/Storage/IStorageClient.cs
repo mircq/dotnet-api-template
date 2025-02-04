@@ -1,9 +1,8 @@
 ﻿using Domain.Result;
-using Infrastructure.Clients;
 
-namespace Infrastructure.Interfaces;
+namespace Application.Clients.Storage;
 
-public interface IMinIOClient
+public interface IStorageClient
 {
     #region Get
     public Task<Result<Stream>> GetAsync(string path);
