@@ -1,15 +1,15 @@
-﻿using Application.Interfaces.Job;
-using Application.Services.MinIO;
+﻿using Application.Clients.Broker;
+using Application.Interfaces.Job;
 using Domain.Entities;
 using Domain.Result;
 using Infrastructure.Interfaces;
 
 namespace Application.Services.Job;
 
-public class JobService<T>(IRabbitMQClient<T> rabbitClient, ILogger<MinIOService> logger) : IJobService<T>
+public class JobService<T>(IBrokerClient<T> brokerClient, ILogger<JobService<T>> logger) : IJobService<T>
 {
-    private readonly IRabbitMQClient<T> _rabbitClient = rabbitClient;
-    private readonly ILogger<MinIOService> _logger = logger;
+    private readonly IBrokerClient<T> _brokerClient = brokerClient;
+    private readonly ILogger<JobService<T>> _logger = logger;
 
     #region Get
     public async Task<Result<T>> GetAsync(Guid id)
@@ -23,7 +23,7 @@ public class JobService<T>(IRabbitMQClient<T> rabbitClient, ILogger<MinIOService
     {
         _logger.LogInformation(message: "Start");
 
-        Result<T> result = await _rabbitClient.EnqueueAsync(entity: entity);
+        Result<T> result = await _brokerClient.EnqueueAsync(entity: entity);
 
         _logger.LogInformation(message: "End");
 

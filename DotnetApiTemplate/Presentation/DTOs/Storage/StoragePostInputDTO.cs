@@ -1,6 +1,6 @@
-﻿namespace Presentation.DTOs.MinIO;
+﻿namespace Presentation.DTOs.Storage;
 
-public class MinIOPostInputDTO
+public class StoragePostInputDTO
 {
     public string BasePath { get; set; }
 

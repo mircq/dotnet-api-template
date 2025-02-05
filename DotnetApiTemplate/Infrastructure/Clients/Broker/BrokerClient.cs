@@ -8,6 +8,7 @@ using System.Text.Json;
 using Domain.Result;
 using Newtonsoft.Json;
 using Domain.Entities;
+using Application.Clients.Broker;
 
 namespace Infrastructure.Clients;
 

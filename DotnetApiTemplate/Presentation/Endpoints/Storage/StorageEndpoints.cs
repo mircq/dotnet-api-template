@@ -1,33 +1,27 @@
-﻿using System.IO;
-using System.Net;
-using Application.Interfaces.MinIO;
+﻿using Application.Interfaces.Storage;
 using Carter;
-using Domain.Entities;
 using Domain.Result;
-using Infrastructure.Clients;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json.Linq;
-using Presentation.DTOs.MinIO;
 using Presentation.Examples.MinIO;
 
 
 namespace Presentation.Endpoints;
 
-public class MinIOEndpoints : ICarterModule
+public class StorageEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         #region Get
 
         app.MapGet(
-            pattern: "/minio",
+            pattern: "/storage",
             handler: async (
                 [FromQuery] string path,
-                [FromServices] IMinIOService minioService
+                [FromServices] IStorageService storageService
             ) => {
 
-                Result<Stream> result = await minioService.GetAsync(path: path);
+                Result<Stream> result = await storageService.GetAsync(path: path);
 
                 if (result.IsFailure)
                 {
@@ -41,7 +35,7 @@ public class MinIOEndpoints : ICarterModule
         {
             Summary = "Download a file from MinIO.",
             Description = "Download a file from a MinIO bucket.",
-            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "MinIO" } },
+            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "Storage" } },
             Parameters = MinIOGetRequestExamples.MinIOGetRequestQueryExamples()
 
         });
@@ -49,12 +43,12 @@ public class MinIOEndpoints : ICarterModule
 
         #region Post
         app.MapPost(
-            pattern: "/minio",
+            pattern: "/storage",
             handler: async (
                 IFormFile file,
                 string filename,
                 string basePath,
-                [FromServices] IMinIOService minioService
+                [FromServices] IStorageService storageService
             ) =>
             {
 
@@ -65,7 +59,7 @@ public class MinIOEndpoints : ICarterModule
 
                 // Upload the file to MinIO
                 using Stream fileStream = file.OpenReadStream();
-                Result<string> result = await minioService.PostAsync(path: $"{basePath}/{filename}", stream: fileStream);
+                Result<string> result = await storageService.PostAsync(path: $"{basePath}/{filename}", stream: fileStream);
                 //Result<Stream> result = await minioService.PostAsync(bucketName, objectName, fileStream, contentType);
 
                 if (result.IsFailure)
@@ -76,9 +70,17 @@ public class MinIOEndpoints : ICarterModule
                 return Results.Created<string>(uri: result.Value, value: null);
             }
         )
+        // .WithMetadata(new OpenApiOperation
+        // {
+        //     Summary = "Upload a file in MinIO.",
+        //     Description = "Upload a file into a MinIO bucket.",
+        //     Tags = new List<OpenApiTag> { new OpenApiTag { Name = "Storage" } },
+        //     Parameters = MinIOGetRequestExamples.MinIOGetRequestQueryExamples()
+
+        // });
         .WithSummary(summary: "Upload a file in MinIO.")
         .WithDescription(description: "Upload a file into a MinIO bucket.")
-        .WithTags(tags: ["MinIO"])
+        .WithTags(tags: ["Storage"])
         .DisableAntiforgery();
         //.WithMetadata(new OpenApiOperation
         //{

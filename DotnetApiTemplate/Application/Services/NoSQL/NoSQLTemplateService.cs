@@ -1,8 +1,8 @@
 ﻿using Application.Interfaces.NoSQL;
+using Application.Repositories.NoSQL;
 using Domain.Entities;
 using Domain.Result;
 using Microsoft.AspNetCore.JsonPatch;
-using Persistence.Interfaces;
 
 namespace Application.Services.NoSQL;
 

@@ -1,9 +1,9 @@
-﻿using Application.Interfaces.MinIO;
-using Application.Interfaces.NoSQL;
+﻿using Application.Interfaces.NoSQL;
 using Application.Interfaces.SQL;
-using Application.Services.MinIO;
+using Application.Interfaces.Storage;
 using Application.Services.NoSQL;
 using Application.Services.SQL;
+using Application.Services.Storage;
 
 namespace Application;
 
@@ -11,11 +11,13 @@ public static class Application
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        // Services registration
+        #region Services
 
         services.AddScoped<ISQLTemplateService, SQLTemplateService>();
         services.AddScoped<INoSQLTemplateService, NoSQLTemplateService>();
-        services.AddScoped<IMinIOService, MinIOService>();
+        services.AddScoped<IStorageService, StorageService>();
+
+        #endregion
 
         return services;
     }

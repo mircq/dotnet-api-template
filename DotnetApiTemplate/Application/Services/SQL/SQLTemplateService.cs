@@ -1,8 +1,8 @@
 ﻿using Application.Interfaces.SQL;
+using Application.Repositories.SQL;
 using Domain.Entities;
 using Domain.Result;
 using Microsoft.AspNetCore.JsonPatch;
-using Persistence.Interfaces;
 
 namespace Application.Services.SQL;
 
@@ -25,12 +25,12 @@ public class SQLTemplateService(ISQLTemplateRepository templateRepository, ILogg
         return result;
     }
 
-    public async Task<Result<TemplateEntity>> ListAsync(FilterEntity filter)
+    public async Task<Result<List<TemplateEntity>>> ListAsync(FilterEntity filter)
     {
         _logger.LogInformation(message: $"Start");
-        _logger.LogDebug(message: $"Input params: id={id}");
+        _logger.LogDebug(message: $"Input params: filter={filter}");
 
-        Result<TemplateEntity> result = await _templateRepository.ListAsync(filter: filter);
+        Result<List<TemplateEntity>> result = await _templateRepository.ListAsync(filter: filter);
 
         _logger.LogInformation(message: "End");
 

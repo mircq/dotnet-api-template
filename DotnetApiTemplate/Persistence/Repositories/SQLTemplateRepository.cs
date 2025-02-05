@@ -2,8 +2,9 @@
 using Domain.Entities;
 using Domain.Errors;
 using Domain.Result;
+using Domain.Utils;
 using Microsoft.AspNetCore.JsonPatch;
-
+using MongoDB.Driver.Linq;
 using Persistence.DbContexts;
 
 
@@ -34,6 +35,18 @@ public class SQLTemplateRepository(SQLDbContext context) : ISQLTemplateRepositor
     #endregion
 
     #region Post
+
+    public async Task<Result<List<TemplateEntity>>> ListAsync(FilterEntity filter)
+    {
+        Result<List<TemplateEntity>> result = await _context.Templates.AsQueryable()
+            .ApplyFilters(filters: filter.filters)
+            .ApplySorting(sortField: filter.SortBy, sortOrder: filter.SortOrder)
+            .ApplyPagination(pageSize: filter.PageSize, pageNumber: filter.PageNumber)
+            .ToListAsync();
+
+        return result;
+    }
+
     public async Task<Result<TemplateEntity>> PostAsync(TemplateEntity entity)
     {
         await _context.Templates.AddAsync(entity);

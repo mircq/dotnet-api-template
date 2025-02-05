@@ -95,7 +95,7 @@ public class SQLTemplateEndpoints : ICarterModule
                 [FromServices] ISQLTemplateService templateService
             ) => {
 
-                FilterEntity filter = filterMapper.ToEntity(dto: dto)
+                FilterEntity filter = filterMapper.ToEntity(dto: dto);
 
                 Result<List<TemplateEntity>> result = await templateService.ListAsync(filter: filter);
 

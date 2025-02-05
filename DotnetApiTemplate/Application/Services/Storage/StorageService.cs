@@ -1,10 +1,10 @@
-﻿using Application.Interfaces.MinIO;
-using Domain.Result;
+﻿using Domain.Result;
 using Application.Clients.Storage;
+using Application.Interfaces.Storage;
 
 namespace Application.Services.Storage;
 
-public class StorageService(IStorageClient storageClient, ILogger<StorageService> logger) : IMinIOService
+public class StorageService(IStorageClient storageClient, ILogger<StorageService> logger) : IStorageService
 {
     private readonly IStorageClient _storageClient = storageClient;
     private readonly ILogger<StorageService> _logger = logger;
