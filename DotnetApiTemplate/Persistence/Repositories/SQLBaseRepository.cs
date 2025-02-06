@@ -1,4 +1,4 @@
-﻿using Application.Repositories.SQL;
+using Application.Repositories.SQL;
 using Domain.Entities;
 using Domain.Errors;
 using Domain.Result;
@@ -10,20 +10,20 @@ using Persistence.DbContexts;
 
 namespace Persistence.Repositories;
 
-public class SQLTemplateRepository(SQLDbContext context) : ISQLTemplateRepository
+public class SQLBaseRepository<T>(SQLDbContext context) where T: BaseEntity
 {
     private readonly SQLDbContext _context = context;
 
     #region Get
-    public async Task<Result<TemplateEntity>> GetAsync(Guid id)
+    public async Task<Result<T>> GetAsync(Guid id)
     {
 
-        TemplateEntity? findResult = await _context.Templates.FindAsync(id);
+        T? findResult = await _context.Set<T>().FindAsync(id);
 
         if (findResult == null)
         {
-            Result<TemplateEntity> errorResult = GenericErrors.NotFoundError(
-                entityType: "template",
+            Result<T> errorResult = GenericErrors.NotFoundError(
+                entityType: typeof(T).Name,
                 id: id
                 );
             return errorResult;
@@ -35,9 +35,9 @@ public class SQLTemplateRepository(SQLDbContext context) : ISQLTemplateRepositor
 
     #region Post
 
-    public async Task<Result<List<TemplateEntity>>> ListAsync(FilterEntity filter)
+    public async Task<Result<List<T>>> ListAsync(FilterEntity filter)
     {
-        Result<List<TemplateEntity>> result = await _context.Templates.AsQueryable()
+        Result<List<T>> result = await _context.Set<T>().AsQueryable()
             .ApplyFilters(filters: filter.filters)
             .ApplySorting(sortField: filter.SortField, sortOrder: filter.SortOrder)
             .ApplyPagination(pageSize: filter.PageSize, pageNumber: filter.PageNumber)
@@ -46,9 +46,9 @@ public class SQLTemplateRepository(SQLDbContext context) : ISQLTemplateRepositor
         return result;
     }
 
-    public async Task<Result<TemplateEntity>> PostAsync(TemplateEntity entity)
+    public async Task<Result<T>> PostAsync(T entity)
     {
-        await _context.Templates.AddAsync(entity);
+        await _context.Set<T>().AddAsync(entity);
 
         await _context.SaveChangesAsync();
 
@@ -57,14 +57,14 @@ public class SQLTemplateRepository(SQLDbContext context) : ISQLTemplateRepositor
     #endregion
 
     #region Put
-    public async Task<Result<TemplateEntity>> PutAsync(Guid id, TemplateEntity entity)
+    public async Task<Result<T>> PutAsync(Guid id, T entity)
     {
-        TemplateEntity? entity_to_update = await _context.Templates.FindAsync(id);
+        T? entity_to_update = await _context.Set<T>().FindAsync(id);
 
         if (entity_to_update == null)
         {
-            Result<TemplateEntity> errorResult = GenericErrors.NotFoundError(
-                entityType: "template",
+            Result<T> errorResult = GenericErrors.NotFoundError(
+                entityType: typeof(T).Name,
                 id: id
                 );
             return errorResult;
@@ -72,7 +72,7 @@ public class SQLTemplateRepository(SQLDbContext context) : ISQLTemplateRepositor
 
         entity.Id = id;
 
-        _context.Templates.Update(entity: entity);
+        _context.Set<T>().Update(entity: entity);
 
         await _context.SaveChangesAsync();
 
@@ -82,20 +82,20 @@ public class SQLTemplateRepository(SQLDbContext context) : ISQLTemplateRepositor
     #endregion
 
     #region Delete
-    public async Task<Result<TemplateEntity>> DeleteAsync(Guid id)
+    public async Task<Result<T>> DeleteAsync(Guid id)
     {
-        TemplateEntity? entity = await _context.Templates.FindAsync(id);
+        T? entity = await _context.Set<T>().FindAsync(id);
 
         if (entity == null)
         {
-            Result<TemplateEntity> errorResult = GenericErrors.NotFoundError(
-                entityType: "template",
+            Result<T> errorResult = GenericErrors.NotFoundError(
+                entityType: typeof(T).Name,
                 id: id
                 );
             return errorResult;
         }
 
-        _context.Templates.Remove(entity: entity);
+        _context.Set<T>().Remove(entity: entity);
 
         await _context.SaveChangesAsync();
 
@@ -104,15 +104,15 @@ public class SQLTemplateRepository(SQLDbContext context) : ISQLTemplateRepositor
     #endregion
 
     #region Patch
-    public async Task<Result<TemplateEntity>> PatchAsync(Guid id, JsonPatchDocument patchDocument)
+    public async Task<Result<T>> PatchAsync(Guid id, JsonPatchDocument patchDocument)
     {
 
-        TemplateEntity? entity = await _context.Templates.FindAsync(id);
+        T? entity = await _context.Set<T>().FindAsync(id);
 
         if (entity == null)
         {
-            Result<TemplateEntity> errorResult = GenericErrors.NotFoundError(
-                entityType: "template",
+            Result<T> errorResult = GenericErrors.NotFoundError(
+                entityType: typeof(T).Name,
                 id: id
                 );
             return errorResult;

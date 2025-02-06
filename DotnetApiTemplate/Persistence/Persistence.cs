@@ -30,6 +30,7 @@ public static class Persistence
             options.UseNpgsql(connectionString: SQLconnectionString); 
         });
 
+        services.AddScoped<ISQLTemplateRepository, SQLTemplateRepository>();
         #endregion
 
         #region NoSQL Database
@@ -46,7 +47,7 @@ public static class Persistence
 
         #endregion
 
-        services.AddScoped<ISQLTemplateRepository, SQLTemplateRepository>();
+        
 
         return services;
     }

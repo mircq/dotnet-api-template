@@ -115,6 +115,7 @@ public class SQLTemplateEndpoints : ICarterModule
             Description = "Retrieve the templates that match the given conditions.",
             Tags = new List<OpenApiTag> { new OpenApiTag { Name = "SQL" } },
             Responses = SQLListTemplatesResponseExamples.SQLListTemplatesResponseExample(),
+            RequestBody = SQLListTemplatesRequestExamples.SQLListTemplatesRequestBodyExamples(),
         });
 
         #endregion
@@ -194,12 +195,14 @@ public class SQLTemplateEndpoints : ICarterModule
             pattern: "/sql/templates/{id}",
             handler: async (
                 [FromRoute] Guid id,
-                [FromBody] JsonPatchDocument patchDocument,
+                [FromBody] List<PatchDTO> dto,
                 [FromServices] SQLTemplatePatchMapper mapper,
                 [FromServices] PatchMapper patchMapper,
                 [FromServices] ISQLTemplateService templateService
         ) =>
             {
+
+                JsonPatchDocument patchDocument = patchMapper.ToEntity(dto: dto);
 
                 Result<TemplateEntity> result = await templateService.PatchAsync(id: id, patchDocument: patchDocument);
 

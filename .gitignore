@@ -19,3 +19,4 @@ bin
 /neo4j_data
 /ollama_embedder_data
 launch.json
+tasks.json

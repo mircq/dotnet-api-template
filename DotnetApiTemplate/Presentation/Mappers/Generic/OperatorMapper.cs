@@ -2,28 +2,28 @@ using Domain.Entities;
 
 namespace Presentation.Mappers.Generic;
 
-public class OperatorMapper
+public static class OperatorMapper
 {
-    public Operator ToEntity(OperatorDTO dto)
+    public static Operator ToEntity(string stringOperator)
     {
-        switch(dto)
+        switch(stringOperator)
         {
-            case var op when op == OperatorDTO.Equal:
+            case var op when op == "==":
                 return Operator.Equal;
-            case var op when op == OperatorDTO.Lower:
+            case var op when op == "<":
                 return Operator.Lower;
-            case var op when op == OperatorDTO.LowerOrEqual:
+            case var op when op == "<=":
                 return Operator.LowerOrEqual;
-            case var op when op == OperatorDTO.Greater:
+            case var op when op == ">":
                 return Operator.Greater;
-            case var op when op == OperatorDTO.GreaterOrEqual:
+            case var op when op == ">=":
                 return Operator.GreaterOrEqual;
             default:
-                throw new Exception($"Operator {dto} not supported.");
+                throw new Exception($"Operator {stringOperator} not supported.");
         }
     }
 
-    public OperatorDTO ToDTO(Operator entity)
+    public static OperatorDTO ToDTO(Operator entity)
     {
         switch(entity)
         {

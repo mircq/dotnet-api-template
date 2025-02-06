@@ -2,7 +2,7 @@ namespace Presentation.DTOs.Generic;
 
 public class FilterDTO
 {
-    public string SortBy { get; set; }
+    public string SortField { get; set; }
 
     public string SortOrder { get; set; }
 

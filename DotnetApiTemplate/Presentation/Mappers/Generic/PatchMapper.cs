@@ -1,13 +1,26 @@
 ﻿using Domain.Entities;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.JsonPatch.Operations;
 using Presentation.DTOs.Generic;
-using Riok.Mapperly.Abstractions;
 
 namespace Presentation.Mappers.Generic;
 
-[Mapper]
-public partial class PatchMapper
+public class PatchMapper
 {
-    public partial PatchDTO ToDTO(PatchEntity entity);
+    public JsonPatchDocument ToEntity(List<PatchDTO> dto)
+    {
+        JsonPatchDocument patchDocument = new JsonPatchDocument();
 
-    public partial PatchEntity ToEntity(PatchDTO dto);
+        foreach(var patch in dto)
+        {
+            patchDocument.Operations.Add(new Operation
+            {
+                op = patch.op,
+                path = patch.path,
+                value = patch.value
+            });
+        }
+        
+        return patchDocument;
+    }
 }

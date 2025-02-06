@@ -3,7 +3,7 @@ using Carter;
 using Domain.Result;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
-using Presentation.Examples.MinIO;
+using Presentation.Examples.Storage;
 
 
 namespace Presentation.Endpoints;
@@ -36,7 +36,7 @@ public class StorageEndpoints : ICarterModule
             Summary = "Download a file from MinIO.",
             Description = "Download a file from a MinIO bucket.",
             Tags = new List<OpenApiTag> { new OpenApiTag { Name = "Storage" } },
-            Parameters = MinIOGetRequestExamples.MinIOGetRequestQueryExamples()
+            Parameters = StorageGetRequestExamples.StorageGetRequestQueryExamples()
 
         });
         #endregion

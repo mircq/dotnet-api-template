@@ -1,4 +1,5 @@
 ﻿using Carter;
+using Presentation.Mappers.Generic;
 using Presentation.Mappers.NoSQL;
 using Presentation.Mappers.SQL;
 
@@ -12,19 +13,25 @@ public static class Presentation
 
         services.AddCarter();
 
-        // Mappers registration
+        #region Mappers
 
         services.AddSingleton<SQLTemplateDeleteMapper>();
         services.AddSingleton<SQLTemplateGetMapper>();
         services.AddSingleton<SQLTemplatePatchMapper>();
         services.AddSingleton<SQLTemplatePostMapper>();
         services.AddSingleton<SQLTemplatePutMapper>();
+        services.AddSingleton<SQLTemplateListMapper>();
 
         services.AddSingleton<NoSQLTemplateDeleteMapper>();
         services.AddSingleton<NoSQLTemplateGetMapper>();
         services.AddSingleton<NoSQLTemplatePatchMapper>();
         services.AddSingleton<NoSQLTemplatePostMapper>();
         services.AddSingleton<NoSQLTemplatePutMapper>();
+        
+        services.AddSingleton<ConditionMapper>();
+        services.AddSingleton<FilterMapper>();
+        services.AddSingleton<PatchMapper>();
+        #endregion
 
         return services;
     }

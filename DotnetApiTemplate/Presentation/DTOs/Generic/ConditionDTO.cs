@@ -6,5 +6,5 @@ public class ConditionDTO
 
     public string Value { get; set; }
 
-    public OperatorDTO Operator { get; set; } = OperatorDTO.Equal;
+    public string Operator { get; set; } = "==";
 }

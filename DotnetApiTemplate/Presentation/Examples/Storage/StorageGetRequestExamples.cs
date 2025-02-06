@@ -1,10 +1,10 @@
 ﻿using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Any;
-namespace Presentation.Examples.MinIO;
+namespace Presentation.Examples.Storage;
 
-public class MinIOGetRequestExamples
+public class StorageGetRequestExamples
 {
-    public static List<OpenApiParameter> MinIOGetRequestQueryExamples()
+    public static List<OpenApiParameter> StorageGetRequestQueryExamples()
     {
         return new List<OpenApiParameter>
         {

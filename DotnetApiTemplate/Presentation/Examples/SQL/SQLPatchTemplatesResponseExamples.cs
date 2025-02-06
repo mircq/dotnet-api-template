@@ -9,7 +9,7 @@ public class SQLPatchTemplatesResponseExamples
         return new OpenApiResponses
         {
             {
-                "201", new OpenApiResponse
+                "200", new OpenApiResponse
                 {
                     Description = "Template patched successfully.",
                     Content = new Dictionary<string, OpenApiMediaType>

@@ -2,7 +2,7 @@ namespace Domain.Entities;
 
 public class FilterEntity
 {
-    public string SortBy { get; set; }
+    public string SortField { get; set; }
 
     public string SortOrder { get; set; }
 
