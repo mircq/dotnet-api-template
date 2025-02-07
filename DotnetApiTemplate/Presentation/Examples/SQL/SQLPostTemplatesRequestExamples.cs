@@ -16,7 +16,8 @@ public class SQLPostTemplatesRequestExamples
                     {
                         Example = new OpenApiObject
                         {
-                            { "Description", new OpenApiString("Sample template description") }
+                            { "description", new OpenApiString(value: "Sample template description") },
+                            { "example", new OpenApiInteger(value: 4)}
                         }
                     }
                 }

@@ -17,16 +17,16 @@ public class SQLListTemplatesRequestExamples
                     {
                         Example = new OpenApiObject
                         {
-                            { "SortField", new OpenApiString("Description") },
-                            { "SortOrder", new OpenApiString("asc") },
-                            { "PageNumber", new OpenApiInteger(1) },
-                            { "PageSize", new OpenApiInteger(10) },
+                            { "SortField", new OpenApiString(value: "Description") },
+                            { "SortOrder", new OpenApiString(value: "asc") },
+                            { "PageNumber", new OpenApiInteger(value: 1) },
+                            { "PageSize", new OpenApiInteger(value: 10) },
                             { "Filters", new OpenApiArray
                                 {
                                     new OpenApiObject{
-                                        { "Key", new OpenApiString("description")},
-                                        { "Value", new OpenApiString("Sample description")},
-                                        { "Operator",  new OpenApiString("==")},
+                                        { "Key", new OpenApiString(value: "value")},
+                                        { "Value", new OpenApiInteger(value: 4)},
+                                        { "Operator",  new OpenApiString(value: "==")},
                                     }
                                 }
                             }

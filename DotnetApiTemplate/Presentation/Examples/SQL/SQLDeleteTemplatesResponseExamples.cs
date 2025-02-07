@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
 
 namespace Presentation.Examples.SQL;
 
@@ -9,7 +10,7 @@ public class SQLDeleteTemplatesResponseExamples
         return new OpenApiResponses
         {
             {
-                "201", new OpenApiResponse
+                "200", new OpenApiResponse
                 {
                     Description = "Template deleted successfully.",
                     Content = new Dictionary<string, OpenApiMediaType>
@@ -17,10 +18,11 @@ public class SQLDeleteTemplatesResponseExamples
                         {
                             "application/json", new OpenApiMediaType
                             {
-                                Example = new Microsoft.OpenApi.Any.OpenApiObject
+                                Example = new OpenApiObject
                                 {
-                                    ["Id"] = new Microsoft.OpenApi.Any.OpenApiString("a971277f-075f-454d-af58-a4c570fb2abb"),
-                                    ["Description"] = new Microsoft.OpenApi.Any.OpenApiString("Sample template description"),
+                                    ["id"] = new OpenApiString(value: "a971277f-075f-454d-af58-a4c570fb2abb"),
+                                    ["description"] = new OpenApiString(value: "Sample template description"),
+                                    ["value"] = new OpenApiInteger(value: 4),
                                 }
                             }
                         }
@@ -39,6 +41,24 @@ public class SQLDeleteTemplatesResponseExamples
                                 Example = new Microsoft.OpenApi.Any.OpenApiObject
                                 {
                                     ["error"] = new Microsoft.OpenApi.Any.OpenApiString("Template not found")
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "500", new OpenApiResponse
+                {
+                    Description = "Internal server error",
+                    Content = new Dictionary<string, OpenApiMediaType>
+                    {
+                        {
+                            "application/json", new OpenApiMediaType
+                            {
+                                Example = new OpenApiObject
+                                {
+                                    ["message"] = new OpenApiString(value: "An error occurred while deleting the template.")
                                 }
                             }
                         }

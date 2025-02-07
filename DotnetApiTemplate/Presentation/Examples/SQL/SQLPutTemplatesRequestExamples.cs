@@ -15,7 +15,7 @@ public class SQLPutTemplatesRequestExamples
                 In = ParameterLocation.Path,
                 Required = true,
                 Description = "The unique ID of the template.",
-                Example = new OpenApiString("a971277f-075f-454d-af58-a4c570fb2abb")
+                Example = new OpenApiString(value: "a971277f-075f-454d-af58-a4c570fb2abb")
             }
         };
     }
@@ -30,7 +30,8 @@ public class SQLPutTemplatesRequestExamples
                     {
                         Example = new OpenApiObject
                         {
-                            { "description", new OpenApiString("Sample template description") }
+                            { "description", new OpenApiString("Sample template description") },
+                            { "value", new OpenApiInteger(value: 4) }
                         }
                     }
                 }
