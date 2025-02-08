@@ -1,20 +1,23 @@
 ﻿namespace Domain.Entities;
 
-public record Operator
+public record OperatorEntity
 {
-    private Operator(string value) => Value = value;
+    private OperatorEntity(string value) => Value = value;
 
     public string Value { get; }
 
-    public static readonly Operator Equal = new(value: "==");
-    public static readonly Operator Contains = new(value: "contains");
-    public static readonly Operator Greater = new(value: ">");
-    public static readonly Operator GreaterOrEqual = new(value: ">=");
-    public static readonly Operator Lower = new(value: "<");
-    public static readonly Operator LowerOrEqual = new(value: "<=");
+    public static readonly OperatorEntity Equal = new(value: "==");
+
+    public static readonly OperatorEntity NotEqual = new(value: "!=");
+    public static readonly OperatorEntity Contains = new(value: "contains");
+    public static readonly OperatorEntity Greater = new(value: ">");
+    public static readonly OperatorEntity GreaterOrEqual = new(value: ">=");
+    public static readonly OperatorEntity Lower = new(value: "<");
+    public static readonly OperatorEntity LowerOrEqual = new(value: "<=");
 
     public static bool IsValid(string value) =>
         value == Equal.Value || 
+        value == NotEqual.Value ||
         value == Contains.Value || 
         value == Greater.Value || 
         value == GreaterOrEqual.Value ||

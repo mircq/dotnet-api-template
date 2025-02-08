@@ -10,11 +10,11 @@ public class StorageGetRequestExamples
         {
             new OpenApiParameter
             {
-                Name = "id",
+                Name = "path",
                 In = ParameterLocation.Query,
                 Required = true,
                 Description = "Path of the file to download.",
-                Example = new OpenApiString("folder/text.txt")
+                Example = new OpenApiString(value: "file.txt")
             }
         };
     }

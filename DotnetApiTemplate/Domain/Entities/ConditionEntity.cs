@@ -1,10 +1,12 @@
-﻿namespace Domain.Entities;
+﻿using System.Text.Json;
+
+namespace Domain.Entities;
 
 public class ConditionEntity
 {
     public string Key { get; set; }
 
-    public object Value { get; set; }
+    public JsonElement Value { get; set; }
 
-    public Operator Operator { get; set; } = Operator.Equal;
+    public OperatorEntity Operator { get; set; } = OperatorEntity.Equal;
 }

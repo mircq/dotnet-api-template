@@ -2,6 +2,7 @@
 using Infrastructure.Clients;
 using Infrastructure.Interfaces;
 using Infrastructure.Settings;
+using Infrastructure.Settings.Storage;
 using Microsoft.Extensions.Configuration;
 
 namespace Infrastructure;
@@ -11,17 +12,17 @@ public static class Infrastructure
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         #region Keycloak
-        KeycloakSettings keycloakSettings = new KeycloakSettings();
-        configuration.GetSection("KeycloakSettings").Bind(instance: keycloakSettings);
+        KeycloakSettings keycloakSettings = new();
+        configuration.GetSection(key: "KeycloakSettings").Bind(instance: keycloakSettings);
 
         services.AddHttpClient<IKeycloakClient, KeycloakClient>();
         #endregion
 
         #region Storage
-        MinIOSettings minIOSettings = new MinIOSettings();
-        configuration.GetSection("MinIOSettings").Bind(instance: minIOSettings);
+        StorageSettings storageSettings = new();
+        configuration.GetSection(key: "StorageSettings").Bind(instance: storageSettings);
 
-        services.AddSingleton<MinIOSettings>();
+        services.AddSingleton(storageSettings);
 
         services.AddScoped<IStorageClient, StorageClient>();
         #endregion

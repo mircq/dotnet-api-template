@@ -17,10 +17,10 @@ public static class FilteringExtensions
         foreach (ConditionEntity filter in filters)
         {
             string propertyName = filter.Key;
-            object value = filter.Value;
+            JsonElement value = filter.Value;
 
             MemberExpression property = Expression.Property(expression: param, propertyName: propertyName);
-            ConstantExpression converted = Expression.Constant(value: Cast(value, property.Type));
+            ConstantExpression converted = Expression.Constant(value: ExtractValue(jsonElement: value));
 
             //UnaryExpression converted = Expression.Convert(expression: constant, type: property.Type);
 
@@ -28,22 +28,25 @@ public static class FilteringExtensions
 
             switch (filter.Operator)
             {
-                case var op when op == Operator.Equal:
+                case var op when op == OperatorEntity.Equal:
                     comparison = Expression.Equal(left: property, right: converted);
+                    break;
+                case var op when op == OperatorEntity.NotEqual:
+                    comparison = Expression.NotEqual(left: property, right: converted);
                     break;
                 // TODO
                 //case var op when op == Operator.Contains:
                 //    comparison = Expression
-                case var op when op == Operator.GreaterOrEqual:
+                case var op when op == OperatorEntity.GreaterOrEqual:
                     comparison = Expression.GreaterThanOrEqual(left: property, right: converted);
                     break;
-                case var op when op == Operator.Greater:
+                case var op when op == OperatorEntity.Greater:
                     comparison = Expression.GreaterThan(left: property, right: converted);
                     break;
-                case var op when op == Operator.LowerOrEqual:
+                case var op when op == OperatorEntity.LowerOrEqual:
                     comparison = Expression.LessThanOrEqual(left: property, right: converted);
                     break;
-                case var op when op == Operator.Lower:
+                case var op when op == OperatorEntity.Lower:
                     comparison = Expression.LessThan(left: property, right: converted);
                     break;
             }

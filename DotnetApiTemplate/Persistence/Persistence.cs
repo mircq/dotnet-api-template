@@ -20,7 +20,7 @@ public static class Persistence
         #region SQL Database
 
         SQLDatabaseSettings SQLDatabaseSettings = new SQLDatabaseSettings();
-        configuration.GetSection("SQLDatabaseSettings").Bind(instance: SQLDatabaseSettings);
+        configuration.GetSection(key: "SQLDatabaseSettings").Bind(instance: SQLDatabaseSettings);
 
         services.AddDbContext<SQLDbContext>((serviceProvider, options) =>
         {
@@ -36,7 +36,7 @@ public static class Persistence
         #region NoSQL Database
 
         NoSQLDatabaseSettings noSQLDatabaseSettings = new NoSQLDatabaseSettings();
-        configuration.GetSection("NoSQLDatabaseSettings").Bind(instance: noSQLDatabaseSettings);
+        configuration.GetSection(key: "NoSQLDatabaseSettings").Bind(instance: noSQLDatabaseSettings);
 
         string NoSQLConnectionString = $"mongodb://{noSQLDatabaseSettings.User}:{noSQLDatabaseSettings.Password}@{noSQLDatabaseSettings.Host}:{noSQLDatabaseSettings.Port}";
 

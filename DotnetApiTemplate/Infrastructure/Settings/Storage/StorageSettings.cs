@@ -1,6 +1,6 @@
-﻿namespace Infrastructure.Settings;
+﻿namespace Infrastructure.Settings.Storage;
 
-public class MinIOSettings
+public class StorageSettings
 {
     public string Host { get; set; }
 

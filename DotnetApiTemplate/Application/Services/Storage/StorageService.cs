@@ -10,16 +10,16 @@ public class StorageService(IStorageClient storageClient, ILogger<StorageService
     private readonly ILogger<StorageService> _logger = logger;
 
     #region Get
-    public async Task<Result<Stream>> GetAsync(string path)
+    public async Task<Result<FileEntity>> GetAsync(string path)
     {
         return await _storageClient.GetAsync(path: path);
     }
     #endregion
 
     #region Get
-    public async Task<Result<string>> PostAsync(string path, Stream stream)
+    public async Task<Result<string>> PostAsync(string path, IFormFile file)
     {
-        return await _storageClient.PostAsync(path: path, stream: stream);
+        return await _storageClient.PostAsync(path: path, file: file);
     }
     #endregion
 }

@@ -20,7 +20,6 @@ public class SQLPutTemplatesResponseExamples
                             {
                                 Example = new OpenApiObject
                                 {
-                                    ["id"] = new OpenApiString(value: "a971277f-075f-454d-af58-a4c570fb2abb"),
                                     ["description"] = new OpenApiString(value: "Sample template description"),
                                     ["value"] = new OpenApiInteger(value: 4),
                                 }

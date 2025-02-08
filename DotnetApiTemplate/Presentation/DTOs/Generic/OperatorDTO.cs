@@ -5,6 +5,8 @@ public record OperatorDTO
     public string Value { get; }
 
     public static readonly OperatorDTO Equal = new(value: "==");
+
+    public static readonly OperatorDTO NotEqual = new(value: "!=");
     public static readonly OperatorDTO Contains = new(value: "contains");
     public static readonly OperatorDTO Greater = new(value: ">");
     public static readonly OperatorDTO GreaterOrEqual = new(value: ">=");

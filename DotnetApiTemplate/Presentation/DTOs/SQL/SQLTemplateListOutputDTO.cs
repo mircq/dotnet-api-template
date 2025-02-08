@@ -15,4 +15,6 @@ public class SQLTemplateListOutputDTO
     /// </summary>
     /// <example>This is a sample description</example>
     public string Description { get; set; }
+
+    public int Value {get; set;}
 }

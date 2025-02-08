@@ -1,4 +1,3 @@
-using Application.Repositories.SQL;
 using Domain.Entities;
 using Domain.Errors;
 using Domain.Result;
@@ -10,12 +9,13 @@ using Persistence.DbContexts;
 
 namespace Persistence.Repositories;
 
-public class SQLBaseRepository<T>(SQLDbContext context) where T: BaseEntity
+// TODO change base entity
+public class SQLBaseRepository<T>(SQLDbContext context) where T: TemplateEntity
 {
     private readonly SQLDbContext _context = context;
 
     #region Get
-    public async Task<Result<T>> GetAsync(Guid id)
+    public virtual async Task<Result<T>> GetAsync(Guid id)
     {
 
         T? findResult = await _context.Set<T>().FindAsync(id);
@@ -35,7 +35,7 @@ public class SQLBaseRepository<T>(SQLDbContext context) where T: BaseEntity
 
     #region Post
 
-    public async Task<Result<List<T>>> ListAsync(FilterEntity filter)
+    public virtual async Task<Result<List<T>>> ListAsync(FilterEntity filter)
     {
         Result<List<T>> result = await _context.Set<T>().AsQueryable()
             .ApplyFilters(filters: filter.filters)
@@ -46,7 +46,7 @@ public class SQLBaseRepository<T>(SQLDbContext context) where T: BaseEntity
         return result;
     }
 
-    public async Task<Result<T>> PostAsync(T entity)
+    public virtual async Task<Result<T>> PostAsync(T entity)
     {
         await _context.Set<T>().AddAsync(entity);
 
@@ -57,7 +57,7 @@ public class SQLBaseRepository<T>(SQLDbContext context) where T: BaseEntity
     #endregion
 
     #region Put
-    public async Task<Result<T>> PutAsync(Guid id, T entity)
+    public virtual async Task<Result<T>> PutAsync(Guid id, T entity)
     {
         T? entity_to_update = await _context.Set<T>().FindAsync(id);
 
@@ -72,7 +72,10 @@ public class SQLBaseRepository<T>(SQLDbContext context) where T: BaseEntity
 
         entity.Id = id;
 
-        _context.Set<T>().Update(entity: entity);
+        // TODO can be done in a better way?
+        _context.Set<T>().Remove(entity: entity_to_update);
+
+        await _context.Set<T>().AddAsync(entity: entity);
 
         await _context.SaveChangesAsync();
 
@@ -82,7 +85,7 @@ public class SQLBaseRepository<T>(SQLDbContext context) where T: BaseEntity
     #endregion
 
     #region Delete
-    public async Task<Result<T>> DeleteAsync(Guid id)
+    public virtual async Task<Result<T>> DeleteAsync(Guid id)
     {
         T? entity = await _context.Set<T>().FindAsync(id);
 
@@ -104,7 +107,7 @@ public class SQLBaseRepository<T>(SQLDbContext context) where T: BaseEntity
     #endregion
 
     #region Patch
-    public async Task<Result<T>> PatchAsync(Guid id, JsonPatchDocument patchDocument)
+    public virtual async Task<Result<T>> PatchAsync(Guid id, JsonPatchDocument patchDocument)
     {
 
         T? entity = await _context.Set<T>().FindAsync(id);

@@ -1,38 +1,33 @@
-﻿using System.Globalization;
-using System.IO;
-using System.IO.Pipes;
-using System.Net.Mime;
-using System.Security.AccessControl;
-using System.Text;
-using System.Xml.Linq;
-using Domain.Errors;
+﻿using Domain.Errors;
 using Domain.Result;
-using Infrastructure.Settings;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing.Constraints;
 using Minio;
 using Minio.DataModel.Args;
 using Minio.Exceptions;
 using MimeDetective;
-using MimeDetective.Engine;
-using System.Collections.Immutable;
 using Application.Clients.Storage;
+using Infrastructure.Settings.Storage;
+using Minio.DataModel;
+using Minio.DataModel.Response;
+using System.Collections.Immutable;
+using MimeDetective.Engine;
+
 
 namespace Infrastructure.Clients;
 
 public class StorageClient: IStorageClient
 {
 
-    private IMinioClient minioClient;
-    private string bucketName;
+    private readonly IMinioClient _minioClient;
+    private readonly string bucketName;
     private readonly ILogger<StorageClient> _logger;
 
-    public StorageClient(MinIOSettings settings, ILogger<StorageClient> logger)
+    public StorageClient([FromServices] StorageSettings settings, ILogger<StorageClient> logger)
     {
-        minioClient = new MinioClient()
+        _minioClient = new MinioClient()
             .WithEndpoint(endpoint: $"{settings.Host}:{settings.Port}")
             .WithCredentials(accessKey: settings.AccessKey, secretKey: settings.SecretKey)
-            .WithSSL()
+            //.WithSSL()
             .Build();
 
         bucketName = settings.BucketName;
@@ -47,41 +42,26 @@ public class StorageClient: IStorageClient
     }
 
     #region Get
-    public async Task<Result<Stream>> GetAsync(string path)
+    public async Task<Result<FileEntity>> GetAsync(string path)
     {
 
         _logger.LogInformation(message: "Start");
+        _logger.LogDebug(message: $"Input params: path={path}");
+
+        if (!await BucketExists())
+        {
+            return GenericErrors.NotFoundError(entityType: "bucket", id: bucketName);
+        }
 
         try
         {
 
-            // Check whether the object exists using StatObjectAsync(). If the object is not found,
-            // StatObjectAsync() will throw an exception.
-            //StatObjectArgs statObjectArgs = new StatObjectArgs()
-            //    .WithBucket(bucket: "prova")
-            //    .WithObject(obj: path);
-            //_ = await minioClient.StatObjectAsync(args: statObjectArgs);
+            StatObjectArgs statObjectArgs = new StatObjectArgs()
+               .WithBucket(bucket: bucketName)
+               .WithObject(obj: path);
+            ObjectStat objectStat = await _minioClient.StatObjectAsync(args: statObjectArgs);
 
-
-            ////var getObjectArgs = new GetObjectArgs()
-            ////    .WithBucket("prova")
-            ////    .WithObject(path)
-            ////    .WithCallbackStream(async (stream, cancellationToken) =>
-            ////    {
-            ////        var fileStream = File.Create("aaaaaaa");
-            ////        await stream.CopyToAsync(fileStream, cancellationToken).ConfigureAwait(false);
-            ////        await fileStream.DisposeAsync().ConfigureAwait(false);
-            ////        var writtenInfo = new FileInfo("aaaaaaa");
-            ////        var file_read_size = writtenInfo.Length;
-            ////        // Uncomment to print the file on output console
-            ////        // stream.CopyTo(Console.OpenStandardOutput());
-            ////        Console.WriteLine(
-            ////            $"Successfully downloaded object with requested offset and length {writtenInfo.Length} into file");
-            ////        stream.Dispose();
-            ////    });
-            ////_ = await minioClient.GetObjectAsync(getObjectArgs).ConfigureAwait(false);
-
-            MemoryStream memoryStream = new MemoryStream();
+            MemoryStream memoryStream = new();
             GetObjectArgs getArgs = new GetObjectArgs()
                     .WithBucket(bucket: bucketName)
                     .WithObject(obj: path)
@@ -89,17 +69,22 @@ public class StorageClient: IStorageClient
                     {
                         await stream.CopyToAsync(destination: memoryStream);
                     });
-            // Retrieve the object from MinIO and write it to the memory stream
-            _ = await minioClient.GetObjectAsync(args: getArgs);
+            
+            ObjectStat getObjectStat = await _minioClient.GetObjectAsync(args: getArgs);
 
-            memoryStream.Seek(0, SeekOrigin.Begin); // Reset position
-            return memoryStream;
+            memoryStream.Seek(0, SeekOrigin.Begin);
+
+            return new FileEntity{ 
+                Stream = memoryStream, 
+                ContentType = getObjectStat.ContentType, 
+                FileName = objectStat.ObjectName.Split("/").Last()
+            };
         }
-        catch (BucketNotFoundException e)
+        catch (BucketNotFoundException)
         {
             return GenericErrors.NotFoundError(entityType: "bucket", id: bucketName);
         }
-        catch (ObjectNotFoundException e)
+        catch (ObjectNotFoundException)
         {
             return GenericErrors.NotFoundError(entityType: "file", id: path);
         }
@@ -107,46 +92,55 @@ public class StorageClient: IStorageClient
         {
             return GenericErrors.GenericError(message: e.Message);
         }
-
-
     }
     #endregion
 
     #region Post
-    public async Task<Result<string>> PostAsync(string path, Stream stream)
+    public async Task<Result<string>> PostAsync(string path, IFormFile file)
     {
 
-        BucketExistsArgs bucketArgs = new BucketExistsArgs().WithBucket(bucket: bucketName);
 
-        bool bucketExists = await minioClient.BucketExistsAsync(
-                args: bucketArgs
-        );
-
-        if (!bucketExists)
+        if (!await BucketExists())
         {
             return GenericErrors.NotFoundError(entityType: "bucket", id: bucketName);
         }
 
-        IContentInspector Inspector = new ContentInspectorBuilder()
+        using (var stream = file.OpenReadStream())
         {
-            Definitions = MimeDetective.Definitions.DefaultDefinitions.All()
-        }.Build();
+            IContentInspector Inspector = new ContentInspectorBuilder()
+            {
+                Definitions = MimeDetective.Definitions.DefaultDefinitions.All()
+            }.Build();
 
-        ImmutableArray<DefinitionMatch> results = Inspector.Inspect(content: stream);
-        ImmutableArray<MimeTypeMatch> resultsByMimeType = results.ByMimeType();
-        string contentType = resultsByMimeType.First()?.MimeType ?? "application/octet-stream";
+            ImmutableArray<DefinitionMatch> results = Inspector.Inspect(content: stream);
+            string contentType = results.ByMimeType().Count() == 0 ? "application/octet-stream" : results.ByMimeType().First()?.MimeType;
+            stream.Position = 0;
 
-        PutObjectArgs putObjectArgs = new PutObjectArgs()
-                                            .WithBucket(bucket: bucketName)
-                                            .WithObject(obj: path)
-                                            .WithStreamData(data: stream)
-                                            .WithObjectSize(size: stream.Length)
-                                            .WithContentType(type: contentType);
+            PutObjectArgs putObjectArgs = new PutObjectArgs()
+            .WithBucket(bucket: bucketName)
+            .WithObject(obj: path)
+            .WithStreamData(data: stream)
+            .WithObjectSize(size: -1)
+            .WithContentType(type: contentType);
 
-        await minioClient.PutObjectAsync(args: putObjectArgs);
+            PutObjectResponse putObjectResponse = await _minioClient.PutObjectAsync(args: putObjectArgs);
 
+        }
+        
         return path;
     }
 
     #endregion
+
+    private async Task<bool> BucketExists()
+    {
+        BucketExistsArgs bucketArgs = new BucketExistsArgs()
+            .WithBucket(bucket: bucketName);
+
+        bool bucketExists = await _minioClient.BucketExistsAsync(
+                args: bucketArgs
+        ).ConfigureAwait(false);
+
+        return bucketExists;
+    }
 }

@@ -12,7 +12,7 @@ public partial class ConditionMapper
 
     public partial ConditionEntity ToEntity(ConditionDTO dto);
 
-    private Operator ToOperator(string stringOperator) => OperatorMapper.ToEntity(stringOperator: stringOperator);
+    private OperatorEntity ToOperator(string stringOperator) => OperatorMapper.ToEntity(stringOperator: stringOperator);
 
     // private OperatorDTO ToOperatorDTO(Operator entity) => new OperatorMapper().ToDTO(entity: entity);
 }

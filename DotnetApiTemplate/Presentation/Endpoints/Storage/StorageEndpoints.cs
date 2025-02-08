@@ -3,6 +3,7 @@ using Carter;
 using Domain.Result;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
+using Presentation.DTOs.Storage;
 using Presentation.Examples.Storage;
 
 
@@ -21,14 +22,14 @@ public class StorageEndpoints : ICarterModule
                 [FromServices] IStorageService storageService
             ) => {
 
-                Result<Stream> result = await storageService.GetAsync(path: path);
+                Result<FileEntity> result = await storageService.GetAsync(path: path);
 
                 if (result.IsFailure)
                 {
                     return Results.Json(data: result.Error.Message, statusCode: result.Error.StatusCode);
                 }
 
-                return Results.Stream(result.Value);
+                return Results.File(fileStream: result.Value.Stream, contentType: "application/octet-stream", fileDownloadName: result.Value.FileName);
             }
         )
         .WithMetadata(new OpenApiOperation
@@ -45,21 +46,17 @@ public class StorageEndpoints : ICarterModule
         app.MapPost(
             pattern: "/storage",
             handler: async (
-                IFormFile file,
-                string filename,
-                string basePath,
+                [FromForm] StoragePostInputDTO dto,
                 [FromServices] IStorageService storageService
             ) =>
             {
 
-                if (file == null || file.Length == 0)
+                if (dto.File == null || dto.File.Length == 0)
                 {
                     return Results.BadRequest(error: "No file or empty file provided.");
                 }
 
-                // Upload the file to MinIO
-                using Stream fileStream = file.OpenReadStream();
-                Result<string> result = await storageService.PostAsync(path: $"{basePath}/{filename}", stream: fileStream);
+                Result<string> result = await storageService.PostAsync(path: dto.Path, file: dto.File);
                 //Result<Stream> result = await minioService.PostAsync(bucketName, objectName, fileStream, contentType);
 
                 if (result.IsFailure)

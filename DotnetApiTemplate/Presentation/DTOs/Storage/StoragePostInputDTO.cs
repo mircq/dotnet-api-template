@@ -2,8 +2,8 @@
 
 public class StoragePostInputDTO
 {
-    public string BasePath { get; set; }
+    public IFormFile File { get; set; }
 
-    public string Filename { get; set; }
+    public string Path { get; set; }
 
 }
