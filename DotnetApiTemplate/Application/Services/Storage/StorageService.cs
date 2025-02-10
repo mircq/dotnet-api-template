@@ -12,14 +12,42 @@ public class StorageService(IStorageClient storageClient, ILogger<StorageService
     #region Get
     public async Task<Result<FileEntity>> GetAsync(string path)
     {
-        return await _storageClient.GetAsync(path: path);
+        _logger.LogInformation(message: "Start");
+        _logger.LogDebug(message: $"Input params: path={path}");
+
+        Result<FileEntity> result = await _storageClient.GetAsync(path: path);
+
+        _logger.LogInformation(message: "End");
+
+        return result;
     }
     #endregion
 
-    #region Get
-    public async Task<Result<string>> PostAsync(string path, IFormFile file)
+    #region Post
+    public async Task<Result<FileEntity>> PostAsync(string path, IFormFile file)
     {
-        return await _storageClient.PostAsync(path: path, file: file);
+        _logger.LogInformation(message: "Start");
+        _logger.LogDebug(message: $"Input params: path={path}, file=file of size {file.Length} bytes");
+
+        Result<FileEntity> result = await _storageClient.PostAsync(path: path, file: file);
+
+        _logger.LogInformation(message: "End");
+
+        return result;
+    }
+    #endregion
+
+    #region Delete
+    public async Task<Result<FileEntity>> DeleteAsync(string path)
+    {
+        _logger.LogInformation(message: "Start");
+        _logger.LogDebug(message: $"Input params: path={path}");
+
+        Result<FileEntity> result = await _storageClient.DeleteAsync(path: path);
+
+        _logger.LogInformation(message: "End");
+
+        return result;
     }
     #endregion
 }

@@ -37,8 +37,8 @@ public class StorageEndpoints : ICarterModule
             Summary = "Download a file from MinIO.",
             Description = "Download a file from a MinIO bucket.",
             Tags = new List<OpenApiTag> { new OpenApiTag { Name = "Storage" } },
-            Parameters = StorageGetRequestExamples.StorageGetRequestQueryExamples()
-
+            Parameters = StorageGetRequestExamples.StorageGetRequestQueryExamples(),
+            Responses = StorageGetResponseExamples.StorageGetResponseExample()
         });
         #endregion
 
@@ -56,44 +56,59 @@ public class StorageEndpoints : ICarterModule
                     return Results.BadRequest(error: "No file or empty file provided.");
                 }
 
-                Result<string> result = await storageService.PostAsync(path: dto.Path, file: dto.File);
-                //Result<Stream> result = await minioService.PostAsync(bucketName, objectName, fileStream, contentType);
+                Result<FileEntity> result = await storageService.PostAsync(path: dto.Path, file: dto.File);
 
                 if (result.IsFailure)
                 {
                     return Results.Json(data: result.Error.Message, statusCode: result.Error.StatusCode);
                 }
 
-                return Results.Created<string>(uri: result.Value, value: null);
+                return Results.Created(uri: result.Value.FileName, value: null);
             }
         )
-        // .WithMetadata(new OpenApiOperation
-        // {
-        //     Summary = "Upload a file in MinIO.",
-        //     Description = "Upload a file into a MinIO bucket.",
-        //     Tags = new List<OpenApiTag> { new OpenApiTag { Name = "Storage" } },
-        //     Parameters = MinIOGetRequestExamples.MinIOGetRequestQueryExamples()
+        .WithMetadata(
+            items: new OpenApiOperation
+            {
+                Summary = "Upload a file in MinIO.",
+                Description = "Upload a file into a MinIO bucket.",
+                Tags = new List<OpenApiTag> { new OpenApiTag { Name = "Storage" } },
+            //     Parameters = MinIOGetRequestExamples.MinIOGetRequestQueryExamples()
 
-        // });
-        .WithSummary(summary: "Upload a file in MinIO.")
-        .WithDescription(description: "Upload a file into a MinIO bucket.")
-        .WithTags(tags: ["Storage"])
+            }
+        )
         .DisableAntiforgery();
-        //.WithMetadata(new OpenApiOperation
-        //{
-        //    Summary = "Upload a file in MinIO.",
-        //    Description = "Upload a file into a MinIO bucket.",
-        //    Tags = new List<OpenApiTag> { new OpenApiTag { Name = "MinIO" } },
-        //    // Responses = NoSQLGetTemplatesResponseExamples.NoSQLGetTemplatesResponseExample(),
-        //    //Parameters = NoSQLGetTemplatesRequestExamples.NoSQLGetTemplatesRequestParameterExamples()
-
-        //});
         #endregion
 
         #region Put
         #endregion
 
         #region Delete
+
+        app.MapDelete(
+            pattern: "/storage",
+            handler: async (
+                [FromQuery] string path,
+                [FromServices] IStorageService storageService
+            ) => {
+
+                Result<FileEntity> result = await storageService.DeleteAsync(path: path);
+
+                if (result.IsFailure)
+                {
+                    return Results.Json(data: result.Error.Message, statusCode: result.Error.StatusCode);
+                }
+
+                return Results.NoContent();
+            }
+        )
+        .WithMetadata(new OpenApiOperation
+        {
+            Summary = "Delete a file from MinIO.",
+            Description = "Delete a file from a MinIO bucket.",
+            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "Storage" } },
+            Parameters = StorageDeleteRequestExamples.StorageDeleteRequestQueryExamples(),
+            Responses = StorageDeleteResponseExamples.StorageDeleteResponseExample()
+        });
         #endregion
 
         #region Patch

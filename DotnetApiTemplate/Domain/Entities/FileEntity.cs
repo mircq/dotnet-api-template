@@ -1,7 +1,7 @@
 
 public class FileEntity
 {
-    public Stream Stream {get; set;}
+    public Stream? Stream {get; set;}
 
     public string ContentType { get; set; }
 

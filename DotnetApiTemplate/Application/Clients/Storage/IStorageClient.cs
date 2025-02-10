@@ -9,6 +9,10 @@ public interface IStorageClient
     #endregion
 
     #region Post
-    public Task<Result<string>> PostAsync(string path, IFormFile file);
+    public Task<Result<FileEntity>> PostAsync(string path, IFormFile file);
+    #endregion
+
+    #region Delete
+    public Task<Result<FileEntity>> DeleteAsync(string path);
     #endregion
 }

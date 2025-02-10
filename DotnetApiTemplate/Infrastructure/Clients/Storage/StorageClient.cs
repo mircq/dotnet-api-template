@@ -11,6 +11,7 @@ using Minio.DataModel;
 using Minio.DataModel.Response;
 using System.Collections.Immutable;
 using MimeDetective.Engine;
+using System.Net.Mime;
 
 
 namespace Infrastructure.Clients;
@@ -96,7 +97,7 @@ public class StorageClient: IStorageClient
     #endregion
 
     #region Post
-    public async Task<Result<string>> PostAsync(string path, IFormFile file)
+    public async Task<Result<FileEntity>> PostAsync(string path, IFormFile file)
     {
 
 
@@ -104,6 +105,8 @@ public class StorageClient: IStorageClient
         {
             return GenericErrors.NotFoundError(entityType: "bucket", id: bucketName);
         }
+
+        string contentType;
 
         using (var stream = file.OpenReadStream())
         {
@@ -113,7 +116,7 @@ public class StorageClient: IStorageClient
             }.Build();
 
             ImmutableArray<DefinitionMatch> results = Inspector.Inspect(content: stream);
-            string contentType = results.ByMimeType().Count() == 0 ? "application/octet-stream" : results.ByMimeType().First()?.MimeType;
+            contentType = results.ByMimeType().Count() == 0 ? "application/octet-stream" : results.ByMimeType().First()?.MimeType;
             stream.Position = 0;
 
             PutObjectArgs putObjectArgs = new PutObjectArgs()
@@ -127,7 +130,61 @@ public class StorageClient: IStorageClient
 
         }
         
-        return path;
+        return new FileEntity
+        {
+            FileName = path,
+            ContentType = contentType,
+            Stream = new MemoryStream()
+        };
+    }
+
+    #endregion
+
+    #region Delete
+     public async Task<Result<FileEntity>> DeleteAsync(string path)
+    {
+        _logger.LogInformation(message: "Start");
+        _logger.LogDebug(message: $"Input params: path={path}");
+
+        if (!await BucketExists())
+        {
+            _logger.LogError(message: $"No bucket with id={bucketName} found");
+            return GenericErrors.NotFoundError(entityType: "bucket", id: bucketName);
+        }
+
+        try
+        {
+            StatObjectArgs statObjectArgs = new StatObjectArgs()
+               .WithBucket(bucket: bucketName)
+               .WithObject(obj: path);
+            ObjectStat objectStat = await _minioClient.StatObjectAsync(args: statObjectArgs);
+
+            RemoveObjectArgs removeObjectArgs = new RemoveObjectArgs()
+                .WithBucket(bucket: bucketName)
+                .WithObject(obj: path);
+
+            await _minioClient.RemoveObjectAsync(args: removeObjectArgs);
+
+            _logger.LogInformation(message: "End");
+
+            return new FileEntity
+            {
+                FileName = path,
+                ContentType = objectStat.ContentType
+            };
+        }
+        catch (BucketNotFoundException e)
+        {
+            return GenericErrors.NotFoundError(entityType: "bucket", id: bucketName);
+        }
+        catch (ObjectNotFoundException e)
+        {
+            return GenericErrors.NotFoundError(entityType: "file", id: path);
+        }
+        catch (Exception e)
+        {
+            return GenericErrors.GenericError(message: e.Message);
+        }
     }
 
     #endregion
