@@ -1,4 +1,5 @@
 ﻿using Carter;
+using Presentation.Extensions;
 using Presentation.Mappers.Generic;
 using Presentation.Mappers.NoSQL;
 using Presentation.Mappers.SQL;
@@ -9,9 +10,9 @@ public static class Presentation
 {
     public static IServiceCollection AddPresentation(this IServiceCollection services)
     {
-        Console.WriteLine("Initializng presentation layer");
 
         services.AddCarter();
+        services.AddSwaggerDocumentation();
 
         #region Mappers
 
@@ -34,5 +35,16 @@ public static class Presentation
         #endregion
 
         return services;
+    }
+
+    public static WebApplication UsePresentation(this WebApplication app)
+    {
+        app.MapCarter();
+        app.UseSwaggerDocumentation();
+        //app.UseRouting();
+        //app.UseAuthorization();
+        //app.MapControllers(); // If using MVC
+        
+        return app;
     }
 }

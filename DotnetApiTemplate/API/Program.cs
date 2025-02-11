@@ -1,5 +1,4 @@
 using Application;
-using Carter;
 using Domain;
 using Infrastructure;
 using Persistence;
@@ -32,14 +31,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UsePresentation();
 
 //app.UseHttpsRedirection();
-app.MapCarter();
 
 app.Run();
