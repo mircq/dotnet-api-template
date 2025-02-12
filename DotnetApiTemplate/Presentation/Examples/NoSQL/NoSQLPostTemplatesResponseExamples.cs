@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
 
 namespace Presentation.Examples.NoSQL;
 
@@ -17,10 +18,29 @@ public class NoSQLPostTemplatesResponseExamples
                         {
                             "application/json", new OpenApiMediaType
                             {
-                                Example = new Microsoft.OpenApi.Any.OpenApiObject
+                                Example = new OpenApiObject
                                 {
-                                    ["id"] = new Microsoft.OpenApi.Any.OpenApiString("a971277f-075f-454d-af58-a4c570fb2abb"),
-                                    ["description"] = new Microsoft.OpenApi.Any.OpenApiString("Sample template description"),
+                                    ["id"] = new OpenApiString(value: "a971277f-075f-454d-af58-a4c570fb2abb"),
+                                    ["description"] = new OpenApiString(value: "Sample template description"),
+                                    ["value"] = new OpenApiInteger(value: 4),
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "500", new OpenApiResponse
+                {
+                    Description = "Internal server error",
+                    Content = new Dictionary<string, OpenApiMediaType>
+                    {
+                        {
+                            "application/json", new OpenApiMediaType
+                            {
+                                Example = new OpenApiObject
+                                {
+                                    ["message"] = new OpenApiString(value: "An error occurred while creating the template.")
                                 }
                             }
                         }

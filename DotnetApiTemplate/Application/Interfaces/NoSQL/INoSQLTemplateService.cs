@@ -9,10 +9,11 @@ public interface INoSQLTemplateService
     #region Get
     public Task<Result<TemplateEntity>> GetAsync(Guid id);
 
-    public Task<Result<TemplateEntity>> ListAsync();
     #endregion
 
     #region Post
+    public Task<Result<List<TemplateEntity>>> ListAsync(FilterEntity filter);
+
     public Task<Result<TemplateEntity>> PostAsync(TemplateEntity entity);
     #endregion
 

@@ -10,14 +10,19 @@ public class NoSQLDbContext(DbContextOptions options) : DbContext(options)
 {
     public DbSet<TemplateEntity> Templates { get; init; }
 
-    public static NoSQLDbContext Create(IMongoDatabase database) =>
-        new(new DbContextOptionsBuilder<NoSQLDbContext>()
-            .UseMongoDB(database.Client, database.DatabaseNamespace.DatabaseName)
-            .Options);
+    // public static NoSQLDbContext Create(IMongoDatabase database) =>
+    //     new(new DbContextOptionsBuilder<NoSQLDbContext>()
+    //         .UseMongoDB(database.Client, database.DatabaseNamespace.DatabaseName)
+    //         .Options);
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<TemplateEntity>().ToCollection(name: "templates");
     }
+
+    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)   
+    // {
+    //     optionsBuilder.Use<Your_SQL_Database_function>("YourConnectionStringHere");
+    // }
 }

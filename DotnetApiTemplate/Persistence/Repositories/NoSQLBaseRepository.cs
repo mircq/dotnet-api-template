@@ -1,49 +1,71 @@
 ﻿using Domain.Entities;
 using Domain.Errors;
 using Domain.Result;
+using Domain.Utils;
 using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using Persistence.DbContexts;
 using System.Linq.Expressions;
 
 namespace Persistence.Repositories;
 
-public class MongoRepository<T>(NoSQLDbContext context, IMongoDatabase database, string collectionName) where T : BaseEntity
+public class NoSQLBaseRepository<T>(NoSQLDbContext context) where T : TemplateEntity
 {
-    private readonly IMongoCollection<T> _collection = database.GetCollection<T>(name: collectionName);
     private readonly NoSQLDbContext _context = context;
 
     #region Get
-    public async Task<Result<T>> GetAsync(Guid id)
+    public virtual async Task<Result<T>> GetAsync(Guid id)
     {
-        FilterDefinition<T> filter = Builders<T>.Filter.Eq(field: "_id", value: id);
-        T result = await _collection.Find(filter: filter).FirstOrDefaultAsync();
 
-        if (result == null)
+        T? findResult = await _context.Set<T>().FindAsync(id);
+
+        // FilterDefinition<T> filter = Builders<T>.Filter.Eq(field: "_id", value: id);
+        // T result = await _collection.Find(filter: filter).FirstOrDefaultAsync();
+
+        if (findResult == null)
         {
             return GenericErrors.NotFoundError(entityType: typeof(T).Name, id: id);
         }
 
-        return result;
+        return findResult;
     }
     #endregion
     
     
     #region Post
-    public async Task<Result<T>> CreateAsync(T entity)
+
+    public virtual async Task<Result<List<T>>> ListAsync(FilterEntity filter)
     {
-        await _collection.InsertOneAsync(document: entity);
+        Result<List<T>> result = await _context.Set<T>().AsQueryable()
+            .ApplyFilters(filters: filter.filters)
+            .ApplySorting(sortField: filter.SortField, sortOrder: filter.SortOrder)
+            .ApplyPagination(pageSize: filter.PageSize, pageNumber: filter.PageNumber)
+            .ToListAsync();
 
-        FilterDefinition<T> filter = Builders<T>.Filter.Eq(field: "_id", value: entity.Id);
+        return result;
+    }
 
-        T? findResult = await _collection.Find(filter: filter).FirstOrDefaultAsync();
+    public virtual async Task<Result<T>> PostAsync(T entity)
+    {
+        await _context.Set<T>().AddAsync(entity);
 
-        if (findResult == null)
-        {
-            return GenericErrors.NotFoundError(entityType: "template", id: entity.Id);
-        }
+        await _context.SaveChangesAsync();
 
-        return findResult;
+        return entity;
+
+        // await _collection.InsertOneAsync(document: entity);
+
+        // FilterDefinition<T> filter = Builders<T>.Filter.Eq(field: "_id", value: entity.Id);
+
+        // T? findResult = await _collection.Find(filter: filter).FirstOrDefaultAsync();
+
+        // if (findResult == null)
+        // {
+        //     return GenericErrors.NotFoundError(entityType: typeof(T).Name, id: entity.Id);
+        // }
+
+        // return findResult;
 
         //await _context.AddAsync<T>(entity);
 
@@ -52,78 +74,136 @@ public class MongoRepository<T>(NoSQLDbContext context, IMongoDatabase database,
     #endregion
 
     #region Put
-    public async Task<Result<T>> UpdateAsync(Guid id, T entity)
+    public virtual async Task<Result<T>> PutAsync(Guid id, T entity)
     {
-        FilterDefinition<T> filter = Builders<T>.Filter.Eq(field: "_id", value: id);
 
-        T? findResult = await _collection.Find(filter: filter).FirstOrDefaultAsync();
+        T? entity_to_update = await _context.Set<T>().FindAsync(id);
 
-        if (findResult == null)
+        if (entity_to_update == null)
         {
-            return GenericErrors.NotFoundError(entityType: typeof(T).Name, id: id);
-        }
-
-        ReplaceOneResult updateResult = await _collection.ReplaceOneAsync(filter: filter, replacement: entity);
-
-        if (updateResult.ModifiedCount == 0)
-        {
-            return GenericErrors.GenericError(message: "An error occurred while replacing the template.");
+            Result<T> errorResult = GenericErrors.NotFoundError(
+                entityType: typeof(T).Name,
+                id: id
+                );
+            return errorResult;
         }
 
         entity.Id = id;
 
+        // TODO can be done in a better way?
+        _context.Set<T>().Remove(entity: entity_to_update);
+
+        await _context.Set<T>().AddAsync(entity: entity);
+
+        await _context.SaveChangesAsync();
+
         return entity;
+
+        // FilterDefinition<T> filter = Builders<T>.Filter.Eq(field: "_id", value: id);
+
+        // T? findResult = await _collection.Find(filter: filter).FirstOrDefaultAsync();
+
+        // if (findResult == null)
+        // {
+        //     return GenericErrors.NotFoundError(entityType: typeof(T).Name, id: id);
+        // }
+
+        // ReplaceOneResult updateResult = await _collection.ReplaceOneAsync(filter: filter, replacement: entity);
+
+        // if (updateResult.ModifiedCount == 0)
+        // {
+        //     return GenericErrors.GenericError(message: "An error occurred while replacing the template.");
+        // }
+
+        // entity.Id = id;
+
+        // return entity;
     }
     #endregion
 
     #region Delete
-    public async Task<Result<T>> DeleteAsync(Guid id)
+    public virtual async Task<Result<T>> DeleteAsync(Guid id)
     {
-        FilterDefinition<T> filter = Builders<T>.Filter.Eq(field: "_id", value: id);
+        // FilterDefinition<T> filter = Builders<T>.Filter.Eq(field: "_id", value: id);
 
-        T? findResult = await _collection.Find(filter: filter).FirstOrDefaultAsync();
+        // T? findResult = await _collection.Find(filter: filter).FirstOrDefaultAsync();
 
-        if (findResult == null)
+        // if (findResult == null)
+        // {
+        //     return GenericErrors.NotFoundError(entityType: typeof(T).Name, id: id);
+        // }
+
+        // DeleteResult result = await _collection.DeleteOneAsync(filter: filter);
+
+        // if (result.DeletedCount == 0)
+        // {
+        //     return GenericErrors.GenericError(message: "An error occurred while deleting the template.");
+        // }
+
+        // return findResult;
+
+        T? entity = await _context.Set<T>().FindAsync(id);
+
+        if (entity == null)
         {
-            return GenericErrors.NotFoundError(entityType: typeof(T).Name, id: id);
+            Result<T> errorResult = GenericErrors.NotFoundError(
+                entityType: typeof(T).Name,
+                id: id
+                );
+            return errorResult;
         }
 
-        DeleteResult result = await _collection.DeleteOneAsync(filter: filter);
+        _context.Set<T>().Remove(entity: entity);
 
-        if (result.DeletedCount == 0)
-        {
-            return GenericErrors.GenericError(message: "An error occurred while deleting the template.");
-        }
+        await _context.SaveChangesAsync();
 
-        return findResult;
+        return entity;
     }
     #endregion
     
 
     #region Patch
-    public async Task<Result<T>> PatchAsync(Guid id, JsonPatchDocument patchDocument)
+    public virtual async Task<Result<T>> PatchAsync(Guid id, JsonPatchDocument patchDocument)
     {
-        FilterDefinition<T> filter = Builders<T>.Filter.Eq(field: "_id", value: id);
 
-        T? findResult = await _collection.Find(filter: filter).FirstOrDefaultAsync();
+        T? entity = await _context.Set<T>().FindAsync(id);
 
-        if (findResult == null)
+        if (entity == null)
         {
-            return GenericErrors.NotFoundError(entityType: typeof(T).Name, id: id);
+            Result<T> errorResult = GenericErrors.NotFoundError(
+                entityType: typeof(T).Name,
+                id: id
+                );
+            return errorResult;
         }
 
-        patchDocument.ApplyTo(objectToApplyTo: findResult);
+        patchDocument.ApplyTo(objectToApplyTo: entity);
 
-        ReplaceOneResult updateResult = await _collection.ReplaceOneAsync(filter: filter, replacement: findResult);
+        await _context.SaveChangesAsync();
 
-        if (updateResult.ModifiedCount == 0)
-        {
-            return GenericErrors.GenericError(message: "An error occurred while replacing the template.");
-        }
+        return entity;
 
-        findResult.Id = id;
+        // FilterDefinition<T> filter = Builders<T>.Filter.Eq(field: "_id", value: id);
 
-        return findResult;
+        // T? findResult = await _collection.Find(filter: filter).FirstOrDefaultAsync();
+
+        // if (findResult == null)
+        // {
+        //     return GenericErrors.NotFoundError(entityType: typeof(T).Name, id: id);
+        // }
+
+        // patchDocument.ApplyTo(objectToApplyTo: findResult);
+
+        // ReplaceOneResult updateResult = await _collection.ReplaceOneAsync(filter: filter, replacement: findResult);
+
+        // if (updateResult.ModifiedCount == 0)
+        // {
+        //     return GenericErrors.GenericError(message: "An error occurred while replacing the template.");
+        // }
+
+        // findResult.Id = id;
+
+        // return findResult;
     }
     #endregion
 }

@@ -50,22 +50,31 @@ public class NoSQLTemplateEndpoints: ICarterModule
          });
 
 
-        app.MapGet(
-            pattern: "/nosql/templates",
+        
+
+
+        #endregion
+
+        #region Post
+        app.MapPost(
+            pattern: "/nosql/templates/filter",
             handler: async (
+                [FromBody] FilterDTO dto,
                 [FromServices] NoSQLTemplateGetMapper mapper,
+                [FromServices] FilterMapper filterMapper,
                 [FromServices] INoSQLTemplateService templateService
             ) =>
             {
-                // TODO
-                Result<TemplateEntity> result = await templateService.ListAsync();
+                FilterEntity entity = filterMapper.ToEntity(dto: dto);
+                
+                Result<List<TemplateEntity>> result = await templateService.ListAsync(filter: entity);
 
                 if (result.IsFailure)
                 {
                     return Results.Json(data: result.Error.Message, statusCode: result.Error.StatusCode);
                 }
 
-                NoSQLTemplateGetOutputDTO output = mapper.ToDTO(entity: result.Value);
+                List<NoSQLTemplateGetOutputDTO> output = result.Value.Select(entity => mapper.ToDTO(entity: entity)).ToList();
 
                 return Results.Ok(value: result.Value);
             }
@@ -74,14 +83,12 @@ public class NoSQLTemplateEndpoints: ICarterModule
         {
             Summary = "Retrieve a list of templates.",
             Description = "Retrieve the templates that match the given conditions.",
-            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "NoSQL" } },       
+            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "NoSQL" } },     
+            RequestBody = NoSQLListTemplatesRequestExamples.NoSQLListTemplatesRequestBodyExamples(),  
             Responses = NoSQLListTemplatesResponseExamples.NoSQLListTemplatesResponseExample(),
         });
-
-
-        #endregion
-
-        #region Post
+        
+        
         app.MapPost(
             pattern: "/nosql/templates",
             handler: async (

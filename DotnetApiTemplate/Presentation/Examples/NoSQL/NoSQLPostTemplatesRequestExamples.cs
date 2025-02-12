@@ -16,8 +16,8 @@ public class NoSQLPostTemplatesRequestExamples
                     {
                         Example = new OpenApiObject
                         {
-                            { "id", new OpenApiString("a971277f-075f-454d-af58-a4c570fb2abb") },
-                            { "description", new OpenApiString("Sample template description") }
+                            { "description", new OpenApiString(value: "Sample template description") },
+                            { "value", new OpenApiInteger(value: 4)}
                         }
                     }
                 }

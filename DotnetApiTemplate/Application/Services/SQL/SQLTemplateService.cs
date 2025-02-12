@@ -44,7 +44,7 @@ public class SQLTemplateService(ISQLTemplateRepository templateRepository, ILogg
     {
 
         _logger.LogInformation(message: "Start");
-        _logger.LogDebug(message: $"Input params:");
+        _logger.LogDebug(message: $"Input params: entity={entity}");
 
         Result<TemplateEntity> result = await _templateRepository.PostAsync(entity: entity);
 
@@ -59,6 +59,7 @@ public class SQLTemplateService(ISQLTemplateRepository templateRepository, ILogg
     public async Task<Result<TemplateEntity>> PutAsync(Guid id, TemplateEntity entity)
     {
         _logger.LogInformation(message: "Start");
+        _logger.LogDebug(message: $"Input params: id={id}, entity={entity}");
 
         Result<TemplateEntity> result = await _templateRepository.PutAsync(id: id, entity: entity);
 
@@ -73,6 +74,7 @@ public class SQLTemplateService(ISQLTemplateRepository templateRepository, ILogg
     public async Task<Result<TemplateEntity>> DeleteAsync(Guid id)
     {
         _logger.LogInformation(message: "Start");
+        _logger.LogDebug(message: $"Input params: id={id}");
 
         Result<TemplateEntity> result = await _templateRepository.DeleteAsync(id: id);
 
@@ -86,6 +88,9 @@ public class SQLTemplateService(ISQLTemplateRepository templateRepository, ILogg
 
     public async Task<Result<TemplateEntity>> PatchAsync(Guid id, JsonPatchDocument patchDocument)
     {
+        _logger.LogInformation(message: "Start");
+        _logger.LogDebug(message: $"Input params: id={id}, patchDocument={patchDocument}");
+
         Result<TemplateEntity> result = await _templateRepository.PatchAsync(id: id, patchDocument: patchDocument);
 
         _logger.LogInformation(message: "End");

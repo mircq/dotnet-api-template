@@ -12,6 +12,8 @@ public interface INoSQLTemplateRepository
 
     #region Post
     Task<Result<TemplateEntity>> PostAsync(TemplateEntity entity);
+
+    Task<Result<List<TemplateEntity>>> ListAsync(FilterEntity filter);
     #endregion
 
     #region Put
