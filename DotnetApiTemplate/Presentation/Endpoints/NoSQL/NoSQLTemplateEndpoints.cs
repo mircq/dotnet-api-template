@@ -196,11 +196,13 @@ public class NoSQLTemplateEndpoints: ICarterModule
             pattern: "/nosql/templates/{id}",
             handler: async (
                 [FromRoute] Guid id,
-                [FromBody] JsonPatchDocument patchDocument,
+                [FromBody] List<PatchDTO> dto,
                 [FromServices] NoSQLTemplatePatchMapper mapper,
                 [FromServices] PatchMapper patchMapper,
                 [FromServices] INoSQLTemplateService templateService
             ) => {
+
+                JsonPatchDocument patchDocument = patchMapper.ToEntity(dto: dto);
 
                 Result<TemplateEntity> result = await templateService.PatchAsync(id: id, patchDocument: patchDocument);
 

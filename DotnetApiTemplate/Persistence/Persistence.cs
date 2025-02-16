@@ -36,7 +36,7 @@ public static class Persistence
 
         #region NoSQL Database
 
-        NoSQLDatabaseSettings noSQLDatabaseSettings = new NoSQLDatabaseSettings();
+        NoSQLDatabaseSettings noSQLDatabaseSettings = new();
         configuration.GetSection(key: "NoSQLDatabaseSettings").Bind(instance: noSQLDatabaseSettings);
 
         services.AddDbContext<NoSQLDbContext>((IServiceProvider serviceProvider, DbContextOptionsBuilder options) =>

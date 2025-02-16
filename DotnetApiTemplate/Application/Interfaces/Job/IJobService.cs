@@ -6,7 +6,7 @@ namespace Application.Interfaces.Job;
 public interface IJobService<T>
 {
     # region Get
-    public Task<Result<T>> GetAsync(Guid id);
+    public Task<Result<T>> GetAsync(Guid id, bool wait);
     # endregion
 
     # region Post

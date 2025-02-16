@@ -20,7 +20,7 @@ public static class FilteringExtensions
             JsonElement value = filter.Value;
 
             MemberExpression property = Expression.Property(expression: param, propertyName: propertyName);
-            ConstantExpression converted = Expression.Constant(value: ExtractValue(jsonElement: value));
+            ConstantExpression converted = Expression.Constant(value: DynamicExtractor.ExtractValue(jsonElement: value));
 
             //UnaryExpression converted = Expression.Convert(expression: constant, type: property.Type);
 
@@ -81,7 +81,7 @@ public static class FilteringExtensions
             .GetMethods()
             .First(method => method.Name == methodName && method.GetParameters().Length == 2)
             .MakeGenericMethod(typeof(T), property.Type)
-            .Invoke(null, new object[] { source, lambda });
+            .Invoke(null, [source, lambda]);
 
         return (IQueryable<T>)result;
     }
@@ -95,40 +95,4 @@ public static class FilteringExtensions
 
         return source.Skip(count: (int)((pageNumber - 1) * pageSize)).Take(count: (int)pageSize);
     }
-
-    private static object ExtractValue(JsonElement jsonElement)
-    {
-        switch (jsonElement.ValueKind)
-        {
-            case JsonValueKind.Number:
-                // Try parsing as various numeric types
-                if (jsonElement.TryGetInt32(out int intValue))
-                    return intValue;
-                if (jsonElement.TryGetInt64(out long longValue))
-                    return longValue;
-                if (jsonElement.TryGetDouble(out double doubleValue))
-                    return doubleValue;
-                break;
-                
-            case JsonValueKind.String:
-                return jsonElement.GetString();
-
-            case JsonValueKind.True:
-            case JsonValueKind.False:
-                return jsonElement.GetBoolean();
-
-            case JsonValueKind.Null:
-                return null;
-
-            default:
-                throw new InvalidOperationException($"Unsupported JsonValueKind: {jsonElement.ValueKind}");
-        }
-
-        throw new InvalidOperationException("Unable to extract value from JsonElement.");
-    }
-
-    public static dynamic Cast(object obj, Type castTo)
-{
-    return Convert.ChangeType(obj, castTo);
-}
 }

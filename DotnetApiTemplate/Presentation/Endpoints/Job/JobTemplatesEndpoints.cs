@@ -17,16 +17,15 @@ public class JobTemplatesEndpoints: ICarterModule
         app.MapGet(
             pattern: "/job/templates/{id}",
             handler: async (
-                [FromBody] JobInputDTO body,
+                [FromRoute] Guid id,
+                [FromRoute] bool wait,
                 [FromServices] JobTemplateMapper templateMapper,
                 [FromServices] JobGenericMapper genericMapper,
                 [FromServices] IJobService<TemplateEntity> jobService
             ) =>
             {
 
-                JobEntity entity = genericMapper.ToEntity(dto: body);
-
-                Result<TemplateEntity> result = await jobService.EnqueueAsync(entity: entity);
+                Result<TemplateEntity> result = await jobService.GetAsync(id: id, wait: wait);
 
                 if (result.IsFailure)
                 {
@@ -40,10 +39,10 @@ public class JobTemplatesEndpoints: ICarterModule
         )
         .WithMetadata(new OpenApiOperation
         {
-            Summary = "Enqueue a new job.",
+            Summary = "Get a new job.",
             Description = "Put a new job into the queue.",
             Tags = new List<OpenApiTag> { new OpenApiTag { Name = "Jobs" } },
-            // Responses = NoSQLGetTemplatesResponseExamples.NoSQLGetTemplatesResponseExample(),
+            //Responses = NoSQLGetTemplatesResponseExamples.NoSQLGetTemplatesResponseExample(),
             //Parameters = NoSQLGetTemplatesRequestExamples.NoSQLGetTemplatesRequestParameterExamples()
 
         });
@@ -78,8 +77,8 @@ public class JobTemplatesEndpoints: ICarterModule
         {
             Summary = "Enqueue a new job.",
             Description = "Put a new job into the queue.",
-            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "Jobs" } },
-            // Responses = NoSQLGetTemplatesResponseExamples.NoSQLGetTemplatesResponseExample(),
+            Tags = [new OpenApiTag { Name = "Jobs" }],
+            //Responses = NoSQLGetTemplatesResponseExamples.NoSQLGetTemplatesResponseExample(),
             //Parameters = NoSQLGetTemplatesRequestExamples.NoSQLGetTemplatesRequestParameterExamples()
 
         });

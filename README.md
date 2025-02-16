@@ -13,7 +13,7 @@ This repo is still a work in progress! This means that some functionalities have
 [![MongoDB](https://img.shields.io/badge/MongoDB-6-%234ea94b.svg?logo=mongodb&style=flat&logoColor=white)](https://www.mongodb.com)
 [![Redis](https://img.shields.io/badge/Redis-6.2-DC382D?logo=Redis&logoColor=white)](https://redis.io/)
 [![Entity Framework](https://img.shields.io/badge/Entity_Framework-9.0.1-000?style=for-the-badge&logo=.net&logoColor=white&color=blue&style=flat)](https://sqlmodel.tiangolo.com/)
-[![Beanie](https://img.shields.io/badge/Beanie-1.27.0-red?style=flat&logoColor=white)](https://beanie-odm.dev/)
+
 
 
 # Project description

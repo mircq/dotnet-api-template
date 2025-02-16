@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using Domain.Entities;
+﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.EntityFrameworkCore;
 using MongoDB.Driver;

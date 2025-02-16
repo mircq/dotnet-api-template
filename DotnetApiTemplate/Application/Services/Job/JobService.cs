@@ -12,9 +12,11 @@ public class JobService<T>(IBrokerClient<T> brokerClient, ILogger<JobService<T>>
     private readonly ILogger<JobService<T>> _logger = logger;
 
     #region Get
-    public async Task<Result<T>> GetAsync(Guid id)
+    public async Task<Result<T>> GetAsync(Guid id, bool wait)
     {
-        throw new NotImplementedException();
+        Result<T> result = await _brokerClient.GetAsync(id: id, wait: wait);
+
+        return result;
     }
     #endregion
 

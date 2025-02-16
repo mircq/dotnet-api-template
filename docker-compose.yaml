@@ -224,6 +224,21 @@ services:
       - MINIO_ROOT_USER=minio_user
       - MINIO_ROOT_PASSWORD=minio_password
       - MINIO_DEFAULT_BUCKETS=bucket
+  rabbitmq:
+    image: rabbitmq:4.0.5
+    container_name: rabbitmq
+    hostname: rabbitmq
+    networks:
+        - template-network
+    ports:
+        - 5672:5672
+        - 15672:15672
+    volumes:
+        - ./rabbitmq_data:/var/lib/rabbitmq/
+        - ./rabbitmq_logs:/var/log/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbitmq_user
+      - RABBITMQ_DEFAULT_PASS=rabbitmq_password
 
 networks:
   template-network:

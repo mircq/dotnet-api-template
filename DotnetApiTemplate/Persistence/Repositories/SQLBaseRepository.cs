@@ -75,6 +75,8 @@ public class SQLBaseRepository<T>(SQLDbContext context) where T: TemplateEntity
         // TODO can be done in a better way?
         _context.Set<T>().Remove(entity: entity_to_update);
 
+        await _context.SaveChangesAsync();
+
         await _context.Set<T>().AddAsync(entity: entity);
 
         await _context.SaveChangesAsync();

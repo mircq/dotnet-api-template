@@ -4,6 +4,7 @@ using Domain.Result;
 using Domain.Utils;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using MongoDB.Driver;
 using Persistence.DbContexts;
 using System.Linq.Expressions;
@@ -19,9 +20,6 @@ public class NoSQLBaseRepository<T>(NoSQLDbContext context) where T : TemplateEn
     {
 
         T? findResult = await _context.Set<T>().FindAsync(id);
-
-        // FilterDefinition<T> filter = Builders<T>.Filter.Eq(field: "_id", value: id);
-        // T result = await _collection.Find(filter: filter).FirstOrDefaultAsync();
 
         if (findResult == null)
         {
@@ -53,23 +51,6 @@ public class NoSQLBaseRepository<T>(NoSQLDbContext context) where T : TemplateEn
         await _context.SaveChangesAsync();
 
         return entity;
-
-        // await _collection.InsertOneAsync(document: entity);
-
-        // FilterDefinition<T> filter = Builders<T>.Filter.Eq(field: "_id", value: entity.Id);
-
-        // T? findResult = await _collection.Find(filter: filter).FirstOrDefaultAsync();
-
-        // if (findResult == null)
-        // {
-        //     return GenericErrors.NotFoundError(entityType: typeof(T).Name, id: entity.Id);
-        // }
-
-        // return findResult;
-
-        //await _context.AddAsync<T>(entity);
-
-        //await _context.Templates.AddAsync(entity: entity);
     }
     #endregion
 
@@ -90,57 +71,22 @@ public class NoSQLBaseRepository<T>(NoSQLDbContext context) where T : TemplateEn
 
         entity.Id = id;
 
-        // TODO can be done in a better way?
+        // TODO can be done in a better way? if you maintain this way, make use to use a rollback mechanism
         _context.Set<T>().Remove(entity: entity_to_update);
 
-        await _context.Set<T>().AddAsync(entity: entity);
+        await _context.SaveChangesAsync();
+
+        EntityEntry insertionResult = await _context.Set<T>().AddAsync(entity: entity);
 
         await _context.SaveChangesAsync();
 
         return entity;
-
-        // FilterDefinition<T> filter = Builders<T>.Filter.Eq(field: "_id", value: id);
-
-        // T? findResult = await _collection.Find(filter: filter).FirstOrDefaultAsync();
-
-        // if (findResult == null)
-        // {
-        //     return GenericErrors.NotFoundError(entityType: typeof(T).Name, id: id);
-        // }
-
-        // ReplaceOneResult updateResult = await _collection.ReplaceOneAsync(filter: filter, replacement: entity);
-
-        // if (updateResult.ModifiedCount == 0)
-        // {
-        //     return GenericErrors.GenericError(message: "An error occurred while replacing the template.");
-        // }
-
-        // entity.Id = id;
-
-        // return entity;
     }
     #endregion
 
     #region Delete
     public virtual async Task<Result<T>> DeleteAsync(Guid id)
     {
-        // FilterDefinition<T> filter = Builders<T>.Filter.Eq(field: "_id", value: id);
-
-        // T? findResult = await _collection.Find(filter: filter).FirstOrDefaultAsync();
-
-        // if (findResult == null)
-        // {
-        //     return GenericErrors.NotFoundError(entityType: typeof(T).Name, id: id);
-        // }
-
-        // DeleteResult result = await _collection.DeleteOneAsync(filter: filter);
-
-        // if (result.DeletedCount == 0)
-        // {
-        //     return GenericErrors.GenericError(message: "An error occurred while deleting the template.");
-        // }
-
-        // return findResult;
 
         T? entity = await _context.Set<T>().FindAsync(id);
 
@@ -182,28 +128,6 @@ public class NoSQLBaseRepository<T>(NoSQLDbContext context) where T : TemplateEn
         await _context.SaveChangesAsync();
 
         return entity;
-
-        // FilterDefinition<T> filter = Builders<T>.Filter.Eq(field: "_id", value: id);
-
-        // T? findResult = await _collection.Find(filter: filter).FirstOrDefaultAsync();
-
-        // if (findResult == null)
-        // {
-        //     return GenericErrors.NotFoundError(entityType: typeof(T).Name, id: id);
-        // }
-
-        // patchDocument.ApplyTo(objectToApplyTo: findResult);
-
-        // ReplaceOneResult updateResult = await _collection.ReplaceOneAsync(filter: filter, replacement: findResult);
-
-        // if (updateResult.ModifiedCount == 0)
-        // {
-        //     return GenericErrors.GenericError(message: "An error occurred while replacing the template.");
-        // }
-
-        // findResult.Id = id;
-
-        // return findResult;
     }
     #endregion
 }

@@ -1,7 +1,10 @@
-﻿using Application.Clients.Storage;
+﻿using Application.Clients.Broker;
+using Application.Clients.Storage;
+using Domain.Entities;
 using Infrastructure.Clients;
 using Infrastructure.Interfaces;
 using Infrastructure.Settings;
+using Infrastructure.Settings.Broker;
 using Infrastructure.Settings.Storage;
 using Microsoft.Extensions.Configuration;
 
@@ -25,6 +28,15 @@ public static class Infrastructure
         services.AddSingleton(storageSettings);
 
         services.AddScoped<IStorageClient, StorageClient>();
+        #endregion
+
+        #region Storage
+        BrokerSettings brokerSettings = new();
+        configuration.GetSection(key: "BrokerSettings").Bind(instance: brokerSettings);
+
+        services.AddSingleton(brokerSettings);
+
+        services.AddScoped<IBrokerClient<TemplateEntity>, BrokerClient<TemplateEntity>>();
         #endregion
 
         return services;
