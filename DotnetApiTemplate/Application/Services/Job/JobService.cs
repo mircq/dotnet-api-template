@@ -21,7 +21,7 @@ public class JobService<T>(IBrokerClient<T> brokerClient, ILogger<JobService<T>>
     #endregion
 
     #region Post
-    public async Task<Result<T>> EnqueueAsync(JobEntity entity)
+    public async Task<Result<Guid>> EnqueueAsync(JobEntity entity)
     {
         _logger.LogInformation(message: "Start");
 

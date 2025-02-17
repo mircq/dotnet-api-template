@@ -10,6 +10,6 @@ public interface IJobService<T>
     # endregion
 
     # region Post
-    public Task<Result<T>> EnqueueAsync(JobEntity entity);
+    public Task<Result<Guid>> EnqueueAsync(JobEntity entity);
     # endregion
 }

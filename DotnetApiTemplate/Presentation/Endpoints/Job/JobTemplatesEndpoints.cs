@@ -5,6 +5,7 @@ using Domain.Result;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using Presentation.DTOs.Job;
+using Presentation.Examples.Job;
 using Presentation.Mappers.Job;
 
 namespace Presentation.Endpoints.Job;
@@ -15,17 +16,17 @@ public class JobTemplatesEndpoints: ICarterModule
     {
         #region Get
         app.MapGet(
-            pattern: "/job/templates/{id}",
+            pattern: "/jobs/sum/{id}",
             handler: async (
                 [FromRoute] Guid id,
-                [FromRoute] bool wait,
+                [FromQuery] bool wait,
                 [FromServices] JobTemplateMapper templateMapper,
                 [FromServices] JobGenericMapper genericMapper,
-                [FromServices] IJobService<TemplateEntity> jobService
+                [FromServices] IJobService<SumEntity> jobService
             ) =>
             {
 
-                Result<TemplateEntity> result = await jobService.GetAsync(id: id, wait: wait);
+                Result<SumEntity> result = await jobService.GetAsync(id: id, wait: wait);
 
                 if (result.IsFailure)
                 {
@@ -39,9 +40,9 @@ public class JobTemplatesEndpoints: ICarterModule
         )
         .WithMetadata(new OpenApiOperation
         {
-            Summary = "Get a new job.",
+            Summary = "Get a job's result.",
             Description = "Put a new job into the queue.",
-            Tags = new List<OpenApiTag> { new OpenApiTag { Name = "Jobs" } },
+            Tags = [new() { Name = "Jobs" }],
             //Responses = NoSQLGetTemplatesResponseExamples.NoSQLGetTemplatesResponseExample(),
             //Parameters = NoSQLGetTemplatesRequestExamples.NoSQLGetTemplatesRequestParameterExamples()
 
@@ -50,7 +51,7 @@ public class JobTemplatesEndpoints: ICarterModule
 
         #region Post
         app.MapPost(
-            pattern: "/job/templates",
+            pattern: "/jobs/sum",
             handler: async (
                 [FromBody] JobInputDTO body,
                 [FromServices] JobTemplateMapper templateMapper,
@@ -61,16 +62,16 @@ public class JobTemplatesEndpoints: ICarterModule
 
                 JobEntity entity = genericMapper.ToEntity(dto: body);
 
-                Result<TemplateEntity> result = await jobService.EnqueueAsync(entity: entity);
+                Result<Guid> result = await jobService.EnqueueAsync(entity: entity);
 
                 if (result.IsFailure)
                 {
                     return Results.Json(data: result.Error.Message, statusCode: result.Error.StatusCode);
                 }
 
-                JobTemplateOutputDTO output = templateMapper.ToDTO(entity: result.Value);
+                JobPostTemplateOutputDTO output = new(){ Id = result.Value}; 
 
-                return Results.Ok<JobTemplateOutputDTO>(value: output);
+                return Results.Ok<JobPostTemplateOutputDTO>(value: output);
             }
         )
         .WithMetadata(new OpenApiOperation
@@ -78,8 +79,8 @@ public class JobTemplatesEndpoints: ICarterModule
             Summary = "Enqueue a new job.",
             Description = "Put a new job into the queue.",
             Tags = [new OpenApiTag { Name = "Jobs" }],
-            //Responses = NoSQLGetTemplatesResponseExamples.NoSQLGetTemplatesResponseExample(),
-            //Parameters = NoSQLGetTemplatesRequestExamples.NoSQLGetTemplatesRequestParameterExamples()
+            Responses = JobPostTemplatesResponseExamples.JobPostTemplatesResponseExample(),
+            RequestBody = JobPostTemplatesRequestExamples.JobPostTemplatesRequestBodyExamples()
 
         });
         #endregion
