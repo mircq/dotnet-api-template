@@ -99,19 +99,24 @@ public class BrokerClient<T>: IBrokerClient<T>
     #endregion
 
     # region Post
-    public async Task<Result<T>> EnqueueAsync(JobEntity entity)
+    public async Task<Result<Guid>> EnqueueAsync(JobEntity entity)
     {
         using IConnection connection = await _connectionFactory.CreateConnectionAsync();
         using IChannel channel = await connection.CreateChannelAsync();
 
         // Create a correlation ID for tracking responses
-        string correlationId = Guid.NewGuid().ToString();
+        Guid correlationId = Guid.NewGuid();
 
         #region Send
-        await channel.QueueDeclareAsync(queue: _queueName, durable: false, exclusive: false, autoDelete: false,
-        arguments: null);
+        await channel.QueueDeclareAsync(
+            queue: _queueName, 
+            durable: false, 
+            exclusive: false, 
+            autoDelete: false,
+            arguments: null
+        );
 
-        Dictionary<string, object> dictionary = new Dictionary<string, object>()
+        Dictionary<string, object> dictionary = new()
         {
             { "function_name", entity.FunctionName },
             { "response_queue", correlationId },
@@ -121,44 +126,45 @@ public class BrokerClient<T>: IBrokerClient<T>
 
         string dictionaryString = System.Text.Json.JsonSerializer.Serialize(value: dictionary);
 
-        // Convert JSON string to bytes
+        //Convert JSON string to bytes
         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(s: dictionaryString);
 
         await channel.BasicPublishAsync(
-            exchange: string.Empty, routingKey: _queueName, body: bytes);
+             exchange: string.Empty, routingKey: _queueName, body: bytes);
 
+        return correlationId;
 
-        #endregion
+        // #endregion
 
-        #region Receive
+        // #region Receive
 
-        await channel.QueueDeclareAsync(
-            queue: correlationId, 
-            durable: false, 
-            exclusive: false, 
-            autoDelete: false,
-            arguments: null
-        );
+        // await channel.QueueDeclareAsync(
+        //     queue: correlationId.ToString(), 
+        //     durable: false, 
+        //     exclusive: false, 
+        //     autoDelete: false,
+        //     arguments: null
+        // );
 
-        var responseTcs = new TaskCompletionSource<Result<T>>();
+        // var responseTcs = new TaskCompletionSource<Result<T>>();
 
-        AsyncEventingBasicConsumer consumer = new AsyncEventingBasicConsumer(channel: channel);
-        consumer.ReceivedAsync += (model, ea) =>
-        {
-            byte[] body = ea.Body.ToArray();
-            string message = Encoding.UTF8.GetString(bytes: body);
+        // AsyncEventingBasicConsumer consumer = new AsyncEventingBasicConsumer(channel: channel);
+        // consumer.ReceivedAsync += (model, ea) =>
+        // {
+        //     byte[] body = ea.Body.ToArray();
+        //     string message = Encoding.UTF8.GetString(bytes: body);
 
-            Result<T> result = JsonConvert.DeserializeObject<Result<T>>(value: message);
+        //     Result<T> result = JsonConvert.DeserializeObject<Result<T>>(value: message);
 
-            Console.WriteLine($" [x] Received {message}");
-            responseTcs.SetResult(result);
+        //     Console.WriteLine($" [x] Received {message}");
+        //     responseTcs.SetResult(result);
 
-            return Task.CompletedTask;
-        };
+        //     return Task.CompletedTask;
+        // };
 
-        await channel.BasicConsumeAsync(queue: correlationId, autoAck: true, consumer: consumer);
+        // await channel.BasicConsumeAsync(queue: correlationId, autoAck: true, consumer: consumer);
 
-        return await responseTcs.Task;
+        // return await responseTcs.Task;
         #endregion
     }
 

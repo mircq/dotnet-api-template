@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using Presentation.DTOs.Job;
 using Presentation.Examples.Job;
+using Presentation.Mappers.Generic;
 using Presentation.Mappers.Job;
 
 namespace Presentation.Endpoints.Job;
@@ -20,8 +21,8 @@ public class JobTemplatesEndpoints: ICarterModule
             handler: async (
                 [FromRoute] Guid id,
                 [FromQuery] bool wait,
-                [FromServices] JobTemplateMapper templateMapper,
-                [FromServices] JobGenericMapper genericMapper,
+                [FromServices] JobSumMapper sumMapper,
+                [FromServices] JobMapper genericMapper,
                 [FromServices] IJobService<SumEntity> jobService
             ) =>
             {
@@ -33,9 +34,9 @@ public class JobTemplatesEndpoints: ICarterModule
                     return Results.Json(data: result.Error.Message, statusCode: result.Error.StatusCode);
                 }
 
-                JobTemplateOutputDTO output = templateMapper.ToDTO(entity: result.Value);
+                JobGetTemplateOutputDTO output = sumMapper.ToDTO(entity: result.Value);
 
-                return Results.Ok<JobTemplateOutputDTO>(value: output);
+                return Results.Ok<JobGetTemplateOutputDTO>(value: output);
             }
         )
         .WithMetadata(new OpenApiOperation
@@ -54,9 +55,8 @@ public class JobTemplatesEndpoints: ICarterModule
             pattern: "/jobs/sum",
             handler: async (
                 [FromBody] JobInputDTO body,
-                [FromServices] JobTemplateMapper templateMapper,
-                [FromServices] JobGenericMapper genericMapper,
-                [FromServices] IJobService<TemplateEntity> jobService
+                [FromServices] JobMapper genericMapper,
+                [FromServices] IJobService<SumEntity> jobService
             ) =>
             {
 

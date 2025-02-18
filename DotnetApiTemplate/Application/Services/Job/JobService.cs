@@ -2,7 +2,6 @@
 using Application.Interfaces.Job;
 using Domain.Entities;
 using Domain.Result;
-using Infrastructure.Interfaces;
 
 namespace Application.Services.Job;
 
@@ -25,7 +24,7 @@ public class JobService<T>(IBrokerClient<T> brokerClient, ILogger<JobService<T>>
     {
         _logger.LogInformation(message: "Start");
 
-        Result<T> result = await _brokerClient.EnqueueAsync(entity: entity);
+        Result<Guid> result = await _brokerClient.EnqueueAsync(entity: entity);
 
         _logger.LogInformation(message: "End");
 

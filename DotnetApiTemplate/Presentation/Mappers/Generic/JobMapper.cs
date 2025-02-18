@@ -2,10 +2,10 @@
 using Presentation.DTOs.Job;
 using Riok.Mapperly.Abstractions;
 
-namespace Presentation.Mappers.Job;
+namespace Presentation.Mappers.Generic;
 
 [Mapper]
-public partial class JobGenericMapper
+public partial class JobMapper
 {
     public partial JobEntity ToEntity(JobInputDTO dto);
 }

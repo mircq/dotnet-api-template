@@ -36,7 +36,7 @@ public static class Infrastructure
 
         services.AddSingleton(brokerSettings);
 
-        services.AddScoped<IBrokerClient<TemplateEntity>, BrokerClient<TemplateEntity>>();
+        services.AddScoped<IBrokerClient<SumEntity>, BrokerClient<SumEntity>>();
         #endregion
 
         return services;

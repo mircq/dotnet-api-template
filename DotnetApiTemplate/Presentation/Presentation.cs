@@ -1,6 +1,7 @@
 ﻿using Carter;
 using Presentation.Extensions;
 using Presentation.Mappers.Generic;
+using Presentation.Mappers.Job;
 using Presentation.Mappers.NoSQL;
 using Presentation.Mappers.SQL;
 
@@ -32,6 +33,9 @@ public static class Presentation
         services.AddSingleton<ConditionMapper>();
         services.AddSingleton<FilterMapper>();
         services.AddSingleton<PatchMapper>();
+        services.AddSingleton<JobMapper>();
+
+        services.AddSingleton<JobSumMapper>();
         #endregion
 
         return services;
