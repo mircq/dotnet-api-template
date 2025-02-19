@@ -24,9 +24,10 @@ public class BrokerClient<T>: IBrokerClient<T>
     {
         _connectionFactory = new ConnectionFactory
         {
-            HostName = $"{settings.Host}/{settings.Port}",
+            HostName = settings.Host,
+            Port = settings.Port,
             UserName = settings.User,
-            Password = settings.Password
+            Password = settings.Password,
         };
 
         _queueName = settings.QueueName;

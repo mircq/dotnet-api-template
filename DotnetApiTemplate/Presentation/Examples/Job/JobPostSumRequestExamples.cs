@@ -2,9 +2,9 @@
 using Microsoft.OpenApi.Any;
 namespace Presentation.Examples.Job;
 
-public class JobPostTemplatesRequestExamples
+public class JobPostSumRequestExamples
 {
-    public static OpenApiRequestBody JobPostTemplatesRequestBodyExamples()
+    public static OpenApiRequestBody JobPostSumRequestBodyExample()
     {
         return new OpenApiRequestBody
         {
@@ -16,7 +16,7 @@ public class JobPostTemplatesRequestExamples
                         Example = new OpenApiObject
                         {
                             
-                            { "FunctionName", new OpenApiString(value: "template_task") },
+                            { "FunctionName", new OpenApiString(value: "sum") },
                             { "Args", new OpenApiArray([]) },
                             { "Kwargs", new OpenApiObject
                                 {

@@ -7,5 +7,5 @@ namespace Presentation.Mappers.Job;
 [Mapper]
 public partial class JobSumMapper
 {
-    public partial JobGetTemplateOutputDTO ToDTO(SumEntity entity);
+    public partial JobGetSumOutputDTO ToDTO(SumEntity entity);
 }

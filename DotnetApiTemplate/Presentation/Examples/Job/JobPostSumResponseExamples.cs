@@ -1,18 +1,18 @@
-using Microsoft.OpenApi.Any;
+﻿using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 
 namespace Presentation.Examples.Job;
 
-public class JobGetTemplatesResponseExamples
+public class JobPostSumResponseExamples
 {
-    public static OpenApiResponses JobGetTemplatesResponseExample()
+    public static OpenApiResponses JobPostSumResponseExample()
     {
         return new OpenApiResponses
         {
             {
                 "200", new OpenApiResponse
                 {
-                    Description = "Task result retrieved successfully.",
+                    Description = "Job enqueued successfully.",
                     Content = new Dictionary<string, OpenApiMediaType>
                     {
                         {
@@ -20,25 +20,7 @@ public class JobGetTemplatesResponseExamples
                             {
                                 Example = new OpenApiObject
                                 {
-                                    ["value"] = new OpenApiInteger(value: 6)
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            {
-                "404", new OpenApiResponse
-                {
-                    Description = "Not Found",
-                    Content = new Dictionary<string, OpenApiMediaType>
-                    {
-                        {
-                            "application/json", new OpenApiMediaType
-                            {
-                                Example = new OpenApiObject
-                                {
-                                    ["error"] = new OpenApiString("Task not found")
+                                    ["id"] = new OpenApiString(value: "a971277f-075f-454d-af58-a4c570fb2abb"),                 
                                 }
                             }
                         }
@@ -56,7 +38,7 @@ public class JobGetTemplatesResponseExamples
                             {
                                 Example = new OpenApiObject
                                 {
-                                    ["message"] = new OpenApiString(value: "An error occurred while retrieving the task.")
+                                    ["message"] = new OpenApiString(value: "An error occurred while deleting the template.")
                                 }
                             }
                         }

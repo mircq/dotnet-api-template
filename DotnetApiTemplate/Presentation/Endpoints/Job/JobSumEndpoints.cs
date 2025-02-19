@@ -4,6 +4,7 @@ using Domain.Entities;
 using Domain.Result;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
+using Presentation.DTOs.Generic;
 using Presentation.DTOs.Job;
 using Presentation.Examples.Job;
 using Presentation.Mappers.Generic;
@@ -11,7 +12,7 @@ using Presentation.Mappers.Job;
 
 namespace Presentation.Endpoints.Job;
 
-public class JobTemplatesEndpoints: ICarterModule
+public class JobSumEndpoints: ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
@@ -34,33 +35,34 @@ public class JobTemplatesEndpoints: ICarterModule
                     return Results.Json(data: result.Error.Message, statusCode: result.Error.StatusCode);
                 }
 
-                JobGetTemplateOutputDTO output = sumMapper.ToDTO(entity: result.Value);
+                JobGetSumOutputDTO output = sumMapper.ToDTO(entity: result.Value);
 
-                return Results.Ok<JobGetTemplateOutputDTO>(value: output);
+                return Results.Ok<JobGetSumOutputDTO>(value: output);
             }
         )
         .WithMetadata(new OpenApiOperation
         {
             Summary = "Get a job's result.",
-            Description = "Put a new job into the queue.",
+            Description = "Retrieve the result of the job with the given id.",
             Tags = [new() { Name = "Jobs" }],
-            //Responses = NoSQLGetTemplatesResponseExamples.NoSQLGetTemplatesResponseExample(),
-            //Parameters = NoSQLGetTemplatesRequestExamples.NoSQLGetTemplatesRequestParameterExamples()
+            Responses = JobGetSumResponseExamples.JobGetTemplatesResponseExample(),
+            Parameters = JobGetSumRequestExamples.JobGetSumRequestParameterExamples()
 
         });
         #endregion
 
         #region Post
         app.MapPost(
-            pattern: "/jobs/sum",
+            pattern: "/jobs",
             handler: async (
-                [FromBody] JobInputDTO body,
-                [FromServices] JobMapper genericMapper,
+                [FromBody] JobDTO body,
+                [FromServices] JobMapper mapper,
+                // TODO should be void not SumEntity
                 [FromServices] IJobService<SumEntity> jobService
             ) =>
             {
 
-                JobEntity entity = genericMapper.ToEntity(dto: body);
+                JobEntity entity = mapper.ToEntity(dto: body);
 
                 Result<Guid> result = await jobService.EnqueueAsync(entity: entity);
 
@@ -69,18 +71,18 @@ public class JobTemplatesEndpoints: ICarterModule
                     return Results.Json(data: result.Error.Message, statusCode: result.Error.StatusCode);
                 }
 
-                JobPostTemplateOutputDTO output = new(){ Id = result.Value}; 
+                JobPostSumOutputDTO output = new(){ Id = result.Value}; 
 
-                return Results.Ok<JobPostTemplateOutputDTO>(value: output);
+                return Results.Ok<JobPostSumOutputDTO>(value: output);
             }
         )
         .WithMetadata(new OpenApiOperation
         {
-            Summary = "Enqueue a new job.",
-            Description = "Put a new job into the queue.",
+            Summary = "Enqueue a new sum job.",
+            Description = "Put a new sum job into the queue.",
             Tags = [new OpenApiTag { Name = "Jobs" }],
-            Responses = JobPostTemplatesResponseExamples.JobPostTemplatesResponseExample(),
-            RequestBody = JobPostTemplatesRequestExamples.JobPostTemplatesRequestBodyExamples()
+            Responses = JobPostSumResponseExamples.JobPostSumResponseExample(),
+            RequestBody = JobPostSumRequestExamples.JobPostSumRequestBodyExample()
 
         });
         #endregion
