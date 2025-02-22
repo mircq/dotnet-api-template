@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 using Domain.Errors;
 
 namespace Domain.Result;
@@ -22,6 +23,14 @@ public class Result<TValue>
     _isSuccess = false;
     Value = default;
     Error = error;
+  }
+
+  [JsonConstructor]
+  public Result(TValue value, Error error)
+  {
+    Value = value;
+    Error = error;
+    _isSuccess = error == null;
   }
 
   public bool IsFailure => !_isSuccess;

@@ -73,7 +73,7 @@ public class JobSumEndpoints: ICarterModule
 
                 JobPostSumOutputDTO output = new(){ Id = result.Value}; 
 
-                return Results.Ok<JobPostSumOutputDTO>(value: output);
+                return Results.Accepted<JobPostSumOutputDTO>(value: output);
             }
         )
         .WithMetadata(new OpenApiOperation

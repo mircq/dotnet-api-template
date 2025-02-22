@@ -20,7 +20,7 @@ public class BrokerClient<T>: IBrokerClient<T>
     private readonly string _queueName;
     private readonly ILogger<BrokerClient<T>> _logger;
 
-    public BrokerClient(BrokerSettings settings)
+    public BrokerClient(BrokerSettings settings, ILogger<BrokerClient<T>> logger)
     {
         _connectionFactory = new ConnectionFactory
         {
@@ -31,6 +31,8 @@ public class BrokerClient<T>: IBrokerClient<T>
         };
 
         _queueName = settings.QueueName;
+
+        _logger = logger;
     }
 
     #region Get

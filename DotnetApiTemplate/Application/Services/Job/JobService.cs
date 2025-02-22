@@ -13,7 +13,11 @@ public class JobService<T>(IBrokerClient<T> brokerClient, ILogger<JobService<T>>
     #region Get
     public async Task<Result<T>> GetAsync(Guid id, bool wait)
     {
+        _logger.LogInformation(message: "Start");
+
         Result<T> result = await _brokerClient.GetAsync(id: id, wait: wait);
+
+        _logger.LogInformation(message: "End");
 
         return result;
     }

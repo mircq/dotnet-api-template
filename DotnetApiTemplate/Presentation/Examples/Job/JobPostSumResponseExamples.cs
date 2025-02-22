@@ -10,7 +10,7 @@ public class JobPostSumResponseExamples
         return new OpenApiResponses
         {
             {
-                "200", new OpenApiResponse
+                "202", new OpenApiResponse
                 {
                     Description = "Job enqueued successfully.",
                     Content = new Dictionary<string, OpenApiMediaType>
