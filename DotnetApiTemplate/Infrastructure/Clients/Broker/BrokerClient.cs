@@ -46,7 +46,22 @@ public class BrokerClient<T>: IBrokerClient<T>
 
         switch(wait)
         {
-            case true:
+            case false:
+
+                // do NOT wait result: check if the queue exists, check if contains messages and return
+
+                try
+                {
+                    // check if the queue exist
+                    QueueDeclareOk response = await channel.QueueDeclarePassiveAsync(queue: id.ToString());
+                }
+                catch 
+                {
+                    return GenericErrors.NotFoundError(entityType: "queue", id: id);
+                }
+
+                // autoack=true means that no manual ack will be sent
+                // if autoack=true the consumer must explicitly mark a message (with an ack, nack or reject)
                 BasicGetResult? getResult = await channel.BasicGetAsync(queue: id.ToString(), autoAck: true);
 
                 if (getResult != null)
@@ -64,7 +79,9 @@ public class BrokerClient<T>: IBrokerClient<T>
                 }
 
                 return GenericErrors.NotFoundError(entityType: "job", id: id);
-            case false:
+            case true:
+
+                // creates or check a queue
                 await channel.QueueDeclareAsync(
                     queue: id.ToString(),
                     durable: false,
@@ -73,9 +90,9 @@ public class BrokerClient<T>: IBrokerClient<T>
                     arguments: null
                 );
 
-                TaskCompletionSource<Result<T>> responseTcs = new TaskCompletionSource<Result<T>>();
+                TaskCompletionSource<Result<T>> responseTaskCompletionSource = new();
 
-                AsyncEventingBasicConsumer consumer = new AsyncEventingBasicConsumer(channel: channel);
+                AsyncEventingBasicConsumer consumer = new(channel: channel);
                 consumer.ReceivedAsync += (object model, BasicDeliverEventArgs ea) =>
                 {
                     _logger.LogDebug(message: "Message received.");
@@ -83,20 +100,31 @@ public class BrokerClient<T>: IBrokerClient<T>
                     byte[] body = ea.Body.ToArray();
                     string message = Encoding.UTF8.GetString(bytes: body);
 
-                    Result<T> result = JsonConvert.DeserializeObject<Result<T>>(value: message);
+                    Result<T> deserializedMessage = JsonConvert.DeserializeObject<Result<T>>(value: message);
 
                     _logger.LogDebug(message: "Message correctly deserialized.");
 
-                    responseTcs.SetResult(result: result);
+                    responseTaskCompletionSource.SetResult(result: deserializedMessage);
 
                     return Task.CompletedTask;
                 };
 
-                await channel.BasicConsumeAsync(queue: id.ToString(), autoAck: true, consumer: consumer);
+                // autoack=true means that no manual ack will be sent
+                // if autoack=true the consumer must explicitly mark a message (with an ack, nack or reject)
+                string consumerTag = await channel.BasicConsumeAsync(queue: id.ToString(), autoAck: true, consumer: consumer);
 
                 _logger.LogInformation(message: "End");
 
-                return await responseTcs.Task;
+                Result<T> jobResult = await responseTaskCompletionSource.Task; 
+
+                // stop consuming messages after the first one
+                await channel.BasicCancelAsync(consumerTag: consumerTag);
+
+                // delete the temporary queue
+                await channel.QueueDeleteAsync(queue: id.ToString());
+
+                return jobResult;
+
         }
     }
     #endregion
