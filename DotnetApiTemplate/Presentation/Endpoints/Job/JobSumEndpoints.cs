@@ -42,58 +42,12 @@ public class JobSumEndpoints: ICarterModule
         )
         .WithMetadata(new OpenApiOperation
         {
-            Summary = "Get a job's result.",
-            Description = "Retrieve the result of the job with the given id.",
+            Summary = "Get a sum job's result.",
+            Description = "Retrieve the result of the sum job with the given id.",
             Tags = [new() { Name = "Jobs" }],
             Responses = JobGetSumResponseExamples.JobGetTemplatesResponseExample(),
             Parameters = JobGetSumRequestExamples.JobGetSumRequestParameterExamples()
-
         });
-        #endregion
-
-        #region Post
-        app.MapPost(
-            pattern: "/jobs",
-            handler: async (
-                [FromBody] JobDTO body,
-                [FromServices] JobMapper mapper,
-                // TODO should be void not SumEntity
-                [FromServices] IJobService<SumEntity> jobService
-            ) =>
-            {
-
-                JobEntity entity = mapper.ToEntity(dto: body);
-
-                Result<Guid> result = await jobService.EnqueueAsync(entity: entity);
-
-                if (result.IsFailure)
-                {
-                    return Results.Json(data: result.Error.Message, statusCode: result.Error.StatusCode);
-                }
-
-                JobPostSumOutputDTO output = new(){ Id = result.Value}; 
-
-                return Results.Accepted<JobPostSumOutputDTO>(value: output);
-            }
-        )
-        .WithMetadata(new OpenApiOperation
-        {
-            Summary = "Enqueue a new sum job.",
-            Description = "Put a new sum job into the queue.",
-            Tags = [new OpenApiTag { Name = "Jobs" }],
-            Responses = JobPostSumResponseExamples.JobPostSumResponseExample(),
-            RequestBody = JobPostSumRequestExamples.JobPostSumRequestBodyExample()
-
-        });
-        #endregion
-
-        #region Put
-        #endregion
-
-        #region Delete
-        #endregion
-
-        #region Patch
         #endregion
     }
 }

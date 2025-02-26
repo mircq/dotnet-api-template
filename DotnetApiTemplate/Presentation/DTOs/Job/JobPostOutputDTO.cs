@@ -1,6 +1,6 @@
 namespace Presentation.DTOs.Job;
 
-public class JobPostSumOutputDTO
+public class JobPostOutputDTO
 {
     public Guid Id { get; set; }
 }
