@@ -7,51 +7,36 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.AI.Embeddings;
+using System.Text;
+using OllamaSharp;
+using Microsoft.SemanticKernel.Embeddings;
+using Microsoft.Extensions.AI;
+using Microsoft.SemanticKernel.Connectors.Ollama;
 
 namespace Infrastructure.Clients;
 
-public class EmbedderClient: IEmbedderClient, ITextEmbeddingGeneration
+public class EmbedderClient: IEmbedderClient, IEmbeddingGenerator
 {
-    private readonly HttpClient _httpClient;
-    private readonly string _ollamaUrl = "http://localhost:11434/api/embeddings";
-        private readonly string _model;
+#pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+    private readonly ITextEmbeddingGenerationService embeddingGenerationService;
+#pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
-        public OllamaEmbeddingService(HttpClient httpClient, string model = "nomic-embed-text")
-        {
-            _httpClient = httpClient;
-            _model = model;
-        }
+#pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+    public EmbedderClient(ITextEmbeddingGenerationService embeddingService)
+#pragma warning restore SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+    {
+           
+        OllamaApiClient ollamaClient = new(
+            uriString: "http://localhost:11434",    
+            defaultModel: "nomic-embed-text"
+        );
 
-        public async Task<IList<float>> GenerateEmbeddingAsync(string text)
-        {
-            var requestBody = new { model = _model, prompt = text };
-            var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
+        embeddingGenerationService = ollamaClient.AsTextEmbeddingGenerationService();
 
-            HttpResponseMessage response = await _httpClient.PostAsync(_ollamaUrl, content);
-            response.EnsureSuccessStatusCode();
+    }
 
-            string responseContent = await response.Content.ReadAsStringAsync();
-            var jsonResponse = JsonSerializer.Deserialize<OllamaEmbeddingResponse>(responseContent);
-
-            return jsonResponse?.Embedding ?? new List<float>();
-        }
-
-        // Required for Semantic Kernel
-        public async Task<IList<ReadOnlyMemory<float>>> GenerateEmbeddingsAsync(IList<string> texts)
-        {
-            var embeddings = new List<ReadOnlyMemory<float>>();
-            foreach (var text in texts)
-            {
-                var embedding = await GenerateEmbeddingAsync(text);
-                embeddings.Add(new ReadOnlyMemory<float>(embedding.ToArray()));
-            }
-            return embeddings;
-        }
-
-        private class OllamaEmbeddingResponse
-        {
-            public List<float>? Embedding { get; set; }
-        }
-
+    public async Task<ReadOnlyMemory<float>> GenerateEmbeddingAsync(string text, CancellationToken cancellationToken = default)
+    {
+        return await embeddingGenerationService.GenerateEmbeddingAsync(value: text, cancellationToken: cancellationToken);
+    }
 }
